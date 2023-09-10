@@ -1,4 +1,4 @@
 # vim:ft=sh
 # Use Starship for Prompt
 
-[[ $(command -v starship) ]] && eval "$(starship init bash)"
+[[ -x $(command -v starship) ]] && eval "$(starship init bash)"

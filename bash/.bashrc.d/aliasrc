@@ -12,8 +12,8 @@ alias \
     la="ls -a" \
     ll="ls -la"
 
-[[ -x "$(command -v eza)" ]] && alias \
-    ls="eza --icons --group-directories-first" \
+[[ -x "$(command -v exa)" ]] && alias \
+    ls="exa --icons --group-directories-first" \
     la="ls -a" \
     ll="la --long --header --git --group --inode" \
     lt="ls -T"

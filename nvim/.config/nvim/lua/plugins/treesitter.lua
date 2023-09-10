@@ -1,3 +1,5 @@
+-- Install Treesitter parsers. Disable for LaTeX.
+
 return {
   "nvim-treesitter/nvim-treesitter",
   opts = {

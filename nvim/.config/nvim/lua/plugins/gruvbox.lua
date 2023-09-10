@@ -1,8 +1,7 @@
-return {
-  -- add gruvbox
-  { "ellisonleao/gruvbox.nvim" },
+-- Install Gruvbox and Set as Colorscheme
 
-  -- Configure LazyVim to load gruvbox
+return {
+  { "ellisonleao/gruvbox.nvim" },
   {
     "LazyVim/LazyVim",
     opts = {

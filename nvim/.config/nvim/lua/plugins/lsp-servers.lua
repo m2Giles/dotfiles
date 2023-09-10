@@ -1,3 +1,5 @@
+-- LSPs to Install by Default
+
 return
 {
   "williamboman/mason.nvim",
@@ -8,7 +10,6 @@ return
       "black",
       "clangd",
       "clang-format",
-      "clang-tidy",
       "latexindent",
       "ltex-ls",
       "lua_ls",
