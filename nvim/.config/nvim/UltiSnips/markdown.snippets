@@ -1,0 +1,28 @@
+snippet header "header" bA
+---
+numbersections: false
+autoEqnLabels: false
+geometry:
+- top=1in
+- left=1in
+- right=1in
+- bottom=1in
+header-includes: |
+  \usepackage{float}
+  \usepackage{fancyhdr}
+  \pagestyle{fancy}
+  \fancyhead[R]{${1: today }}
+  \fancyhead[L]{Mark Mihalik}
+  \fancyhead[C]{${2:Title}}
+  \fancyfoot[C]{\thepage}
+  \let\origfigure\figure
+  \let\endorigfigure\endfigure
+  \renewenvironment{figure}[1][2] {
+    \expandafter\origfigure\expandafter[H]
+  } {
+    \endorigfigure
+  }
+---
+
+$0
+endsnippet

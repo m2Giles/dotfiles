@@ -1,0 +1,18 @@
+# vim:ft=sh
+
+# Get out of Home Directory
+export GOPATH="$HOME/.local/share/go"
+export CARGOHOME="$HOME/.local/share/cargo"
+export NPM_CONFIG_USERCONFIG="$HOME/.config/npm/npmrc"
+export WGETRC="$HOME/.config/wgetrc"
+export LESS=-R
+
+# Applications
+export EDITOR="$VISUAL"
+export COLORTERM="truecolor"
+export OPENER="xdg-open"
+export PAGER="less"
+export BROWSER="firefox"
+
+# GNOME KEYRING
+export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"

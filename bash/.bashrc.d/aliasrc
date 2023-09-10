@@ -1,0 +1,22 @@
+# vim:ft=sh
+
+[[ -x "$(command -v vim)" ]] && export VISUAL=vim
+[[ -x "$(command -v nvim)" ]] && alias vim="nvim" vimdiff="nvim -d" && export VISUAL=nvim
+
+alias \
+    grep="grep --color=auto" \
+    ip="ip --color" \
+    cp="cp -iv" \
+    mv="mv -iv" \
+    rm="rm -vI" \
+    la="ls -a" \
+    ll="ls -la"
+
+[[ -x "$(command -v eza)" ]] && alias \
+    ls="eza --icons --group-directories-first" \
+    la="ls -a" \
+    ll="la --long --header --git --group --inode" \
+    lt="ls -T"
+
+[[ -x "$(command -v bat)" ]] && alias \
+    cat="bat --force-colorization --paging=never --style=snip"
