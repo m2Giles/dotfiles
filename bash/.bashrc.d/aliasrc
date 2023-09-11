@@ -14,9 +14,9 @@ alias \
 
 [[ -x "$(command -v exa)" ]] && alias \
     ls="exa --icons --group-directories-first" \
-    la="ls -a" \
-    ll="la --long --header --git --group --inode" \
-    lt="ls -T"
+    la="exa --all" \
+    ll="exa --all --long --header --git --group --inode" \
+    lt="exa -T"
 
 [[ -x "$(command -v bat)" ]] && alias \
     cat="bat --force-colorization --paging=never --style=snip"
