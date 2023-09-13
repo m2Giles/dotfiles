@@ -7,6 +7,11 @@ return {
   },
   {
     "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-omni",
+      "quangnguyen30192/cmp-nvim-ultisnips",
+      "SirVer/ultisnips",
+    },
     opts = function(_, opts)
       local has_words_before = function()
         unpack = unpack or table.unpack
@@ -16,7 +21,7 @@ return {
 
       local cmp = require("cmp")
       local luasnip = require("luasnip")
-      local ultisnips = require("cmp_nvim_ultisnips.mappings")
+      local ultisnip = require("cmp_nvim_ultisnips.mappings")
 
       opts.sources = cmp.config.sources(vim.list_extend(opts.sources, {
         { name = "omni" },
@@ -27,10 +32,10 @@ return {
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item()
-          -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-          -- this way you will only jump inside the snippet region
-          elseif ultisnips.expand_or_jump_forwards() then
-            ultisnips.expand_or_jump_forwards()
+            -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
+            -- this way you will only jump inside the snippet region
+          elseif ultisnip.expand_or_jump_forwards(fallback) then
+            ultisnip.expand_or_jump_forwards(fallback)
           elseif luasnip.expand_or_jumpable() then
             luasnip.expand_or_jump()
           elseif has_words_before() then
@@ -42,8 +47,8 @@ return {
         ["<S-Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
-          elseif ultisnips.jump_backwards() then
-            ultisnips.jump_backwards()
+          elseif ultisnip.jump_backwards(fallback) then
+            ultisnip.jump_backwards(fallback)
           elseif luasnip.jumpable(-1) then
             luasnip.jump(-1)
           else

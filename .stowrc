@@ -1,0 +1,4 @@
+--ignore .gitconfig
+--dotfiles
+--verbose
+--target=$HOME

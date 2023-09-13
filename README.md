@@ -12,7 +12,7 @@ If you do not have `just` installed. You can manually run the command with:
 
 ```sh
 cd dotfiles
-stow --target=$HOME --restow */
+stow --restow */
 ```
 
 You can also prune all the symlinks with:
@@ -26,10 +26,13 @@ or without `just`:
 
 ```sh
 cd dotfiles
-stow --target=$HOME --delete */
+stow --delete */
 ```
 
-Note: If you have an existing `.bash_profile` and/or `.gitconfig`, the `just` commands will back up your file or restore it respectively.
+Note: If you have an existing `.bash_profile` and/or `.bashrc`, the `just` commands will back up your file as `*.orig`. If the `*.orig` file remains, it will restore it when you use just remove.
 
 [stow]: https://www.gnu.org/software/stow/
 [just]: https://just.systems/
+
+Self Note:
+`.gitconfig` is not managed with stow. A starter one for myself is here.

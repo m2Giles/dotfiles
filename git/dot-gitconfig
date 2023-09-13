@@ -1,0 +1,6 @@
+[user]
+    name = Mark Mihalik
+    email = markamihalik@gmail.com
+
+[credential "https://code.levelup.cce.af.mil"]
+    helper = libsecret
