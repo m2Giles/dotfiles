@@ -14,5 +14,8 @@ export OPENER="xdg-open"
 export PAGER="less"
 export BROWSER="firefox"
 
+# Themes
+export BAT_THEME="gruvbox-dark"
+
 # GNOME KEYRING
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
