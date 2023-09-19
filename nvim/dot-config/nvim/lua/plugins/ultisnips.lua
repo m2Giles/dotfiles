@@ -34,10 +34,10 @@ return {
             cmp.select_next_item()
             -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
             -- this way you will only jump inside the snippet region
-          elseif ultisnip.expand_or_jump_forwards(fallback) then
-            ultisnip.expand_or_jump_forwards(fallback)
           elseif luasnip.expand_or_jumpable() then
             luasnip.expand_or_jump()
+          elseif ultisnip.expand_or_jump_forwards() then
+            ultisnip.expand_or_jump_forwards()
           elseif has_words_before() then
             cmp.complete()
           else
@@ -47,10 +47,10 @@ return {
         ["<S-Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
-          elseif ultisnip.jump_backwards(fallback) then
-            ultisnip.jump_backwards(fallback)
           elseif luasnip.jumpable(-1) then
             luasnip.jump(-1)
+          elseif ultisnip.jump_backwards() then
+            ultisnip.jump_backwards()
           else
             fallback()
           end

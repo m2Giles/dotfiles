@@ -10,7 +10,7 @@ local yank_group = augroup("YankGroup", { clear = true })
 local wrap_group = augroup("WrapGroup", { clear = true })
 
 function Copy()
-  if vim.v.event.operator == "y" and vim.v.event.regname == "+" then
+  if vim.v.event.operator == "y" and vim.v.event.regname == "+" and not vim.g.neovide then
     require("osc52").copy_register("+")
   end
 end

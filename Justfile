@@ -1,6 +1,5 @@
 install:
 	#!/usr/bin/env bash
-	
 	if [ -L ~/.bashrc ]; then
 		echo "~/.bashrc is a symlink"
 	elif [ -f ~/.bashrc ]; then
