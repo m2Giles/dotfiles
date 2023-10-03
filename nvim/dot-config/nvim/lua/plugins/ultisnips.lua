@@ -13,6 +13,12 @@ return {
       "SirVer/ultisnips",
     },
     opts = function(_, opts)
+      local has_words_before = function()
+        unpack = unpack or table.unpack
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+      end
+
       local cmp = require("cmp")
       local luasnip = require("luasnip")
       local ultisnip = require("cmp_nvim_ultisnips.mappings")
@@ -28,6 +34,8 @@ return {
             cmp.confirm({ select = true })
           elseif luasnip.expand_or_jumpable() then
             luasnip.expand_or_jump()
+          elseif has_words_before() and not ultisnip.expand_or_jump_forwards() then
+            cmp.complete()
           else
             ultisnip.expand_or_jump_forwards(fallback)
           end

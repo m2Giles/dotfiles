@@ -17,7 +17,8 @@ g.tex_conceal = "abdmg"
 g.vimtex_fold_enabled = 1
 
 if g.neovide then
-  o.guifont = "Caskaydia Cove Nerd,Noto Color Emoji:h10"
+  o.guifont = "Caskaydia Cove Nerd,Noto Color Emoji:h12"
+  g.neovide_scale_factor = 0.8
   g.neovide_hide_mouse_when_typing = true
   g.neovide_theme = "auto"
   g.neovide_confirm_quit = true
