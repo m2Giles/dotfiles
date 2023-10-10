@@ -9,6 +9,7 @@
   (defvar m2/frame-transparency '(95 . 95))
   (setq lsp-use-plists t)
   (setenv "LSP_USE_PLISTS" "1")
+  (setq vc-follow-symlinks t)
 
 #+end_src
 * Startup Perfomance
@@ -30,9 +31,54 @@
 ** Configure melpa
 #+begin_src emacs-lisp
 
-  (require 'package)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-  (setq use-package-always-ensure t)
+(defvar elpaca-installer-version 0.5)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil
+                              :files (:defaults (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (call-process "git" nil buffer t "clone"
+                                       (plist-get order :repo) repo)))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
+
+#+end_src
+**
+#+begin_src emacs-lisp
+
+(elpaca elpaca-use-package
+  ;; Enable :elpaca use-package keyword.
+  (elpaca-use-package-mode)
+  ;; Assume :elpaca t unless otherwise specified.
+  (setq elpaca-use-package-by-default t))
+
+(elpaca-wait)
 
 #+end_src
 ** Automatic Package Updates
@@ -133,6 +179,39 @@
     (ligature-set-ligatures 't '("www"))
     ;; Enable traditional ligature support in eww-mode, if the
     ;; `variable-pitch' face supports it
+** Rainbows
+#+begin_src emacs-lisp
+
+  (use-package rainbow-delimiters
+    :hook ((emacs-lisp-mode . rainbow-delimiters-mode)))
+
+  (use-package rainbow-mode
+    :diminish
+    :hook org-mode prog-mode)
+
+#+end_src
+** Fonts
+#+begin_src emacs-lisp
+
+  (set-face-attribute 'default nil
+                      :font "CaskaydiaCove Nerd Font" :height m2/default-font-size)
+
+  (set-face-attribute 'fixed-pitch nil
+                      :font "CaskaydiaCove Nerd Font" :height m2/default-font-size)
+
+  (set-face-attribute 'variable-pitch nil
+                      :font "Cantarell" :height m2/default-variable-font-size
+                      :weight 'regular)
+
+#+end_src
+** Ligatures
+#+begin_src emacs-lisp
+  (use-package ligature
+    :config
+    ;; Enable the "www" ligature in every possible major mode
+    (ligature-set-ligatures 't '("www"))
+    ;; Enable traditional ligature support in eww-mode, if the
+    ;; `variable-pitch' face supports it
     (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
     ;; Enable all Cascadia and Fira Code ligatures in programming modes
     (ligature-set-ligatures 'prog-mode
@@ -172,7 +251,6 @@
                               ;; www wwww
                               ("w" (rx (+ "w")))
                               ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
-                              ;; <$> </> <|  <||  <||| <|||| <- <-| <-<<-|-> <->>
                               ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
                               ;; << <<< <<<<
                               ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
@@ -578,6 +656,7 @@
 #+begin_src emacs-lisp
 
   (use-package evil
+    :demand t
     :init
     (setq evil-want-integration t)
     (setq evil-want-keybinding nil)
@@ -1135,39 +1214,6 @@
     :defer t
     :after org-mode)
   
-#+end_src
-*** Julia
-**** Julia Mode
-#+begin_src emacs-lisp
-
-  (use-package julia-mode
-    :hook ((julia-mode . lsp-deferred)))
-
-#+end_src
-**** Julia Snail
-#+begin_src emacs-lisp
-
-  (use-package julia-snail
-    :hook (julia-mode . julia-snail-mode)
-    :config
-    (setq julia-snail-terminal-type :eat))
-
-#+end_src
-**** Julia LSP
-#+begin_src emacs-lisp
-
-  (use-package lsp-julia
-    :after julia-mode
-    :config
-    (setq lsp-julia-default-environment "~/.julia/environments/v1.9"))
-
-#+end_src
-*** C/C++
-#+begin_src emacs-lisp
-
-  (use-package cc-mode
-    :mode (("\\.c\\'" . c-ts-mode)
-           ("\\.h\\'" . c-ts-mode))
     :hook ((c-ts-mode . lsp-deferred)
            (c-mode . lsp-deferred)))
 
@@ -1195,7 +1241,7 @@
                        #'cape-file))))
 
   (use-package lisp-mode
-    :ensure nil
+    :elpaca nil
     :commands emacs-lisp-mode
     :hook ((after-save-hook . check-parens)
            (emacs-lisp-mode . m2/emacs-lisp-mode-setup)))

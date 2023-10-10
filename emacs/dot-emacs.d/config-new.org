@@ -1,0 +1,440 @@
+#+TITLE: M2's Emacs configuration
+#+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
+
+* Define Variables
+#+begin_src emacs-lisp
+
+  (defvar m2/default-font-size 140)
+  (defvar m2/default-variable-font-size 160)
+  (defvar m2/frame-transparency '(95 . 95))
+  (setq lsp-use-plists t)
+  (setenv "LSP_USE_PLISTS" "1")
+  (setq vc-follow-symlinks t)
+
+#+end_src
+
+* Startup Perfomance
+#+begin_src emacs-lisp
+
+  (setq gc-cons-threshold (* 50 1000 1000))
+
+  (defun m2/display-startup-time ()
+    (message "Emacs loaded in %s with %d garbage collections."
+             (format "%.2f seconds"
+                     (float-time
+                      (time-subtract after-init-time before-init-time)))
+             gcs-done))
+
+  (add-hook 'emacs-startup-hook #'m2/display-startup-time)
+
+#+end_src
+* Elpaca Package Manager
+#+begin_src emacs-lisp
+
+  (defvar elpaca-installer-version 0.5)
+  (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+  (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+  (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+  (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+				:ref nil
+				:files (:defaults (:exclude "extensions"))
+				:build (:not elpaca--activate-package)))
+  (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+	 (build (expand-file-name "elpaca/" elpaca-builds-directory))
+	 (order (cdr elpaca-order))
+	 (default-directory repo))
+    (add-to-list 'load-path (if (file-exists-p build) build repo))
+    (unless (file-exists-p repo)
+      (make-directory repo t)
+      (when (< emacs-major-version 28) (require 'subr-x))
+      (condition-case-unless-debug err
+	  (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+		   ((zerop (call-process "git" nil buffer t "clone"
+					 (plist-get order :repo) repo)))
+		   ((zerop (call-process "git" nil buffer t "checkout"
+					 (or (plist-get order :ref) "--"))))
+		   (emacs (concat invocation-directory invocation-name))
+		   ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+					 "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+		   ((require 'elpaca))
+		   ((elpaca-generate-autoloads "elpaca" repo)))
+	      (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+	    (error "%s" (with-current-buffer buffer (buffer-string))))
+	((error) (warn "%s" err) (delete-directory repo 'recursive))))
+    (unless (require 'elpaca-autoloads nil t)
+      (require 'elpaca)
+      (elpaca-generate-autoloads "elpaca" repo)
+      (load "./elpaca-autoloads")))
+  (add-hook 'after-init-hook #'elpaca-process-queues)
+  (elpaca `(,@elpaca-order))
+
+  ;; Install use-package support
+  (elpaca elpaca-use-package
+	  ;; Enable :elpaca use-package keyword.
+	  (elpaca-use-package-mode)
+	  ;; Assume :elpaca t unless otherwise specified.
+	  (setq elpaca-use-package-by-default t))
+
+  ;; Block until current queue processed.
+  (elpaca-wait)
+
+  #+end_src
+
+#+begin_src emacs-lisp
+
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+  (when (file-exists-p custom-file)
+    (load custom-file))
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (setq inhibit-startup-message t)
+
+  (tool-bar-mode -1)
+  (tooltip-mode -1)
+  (set-fringe-mode 10)
+  (menu-bar-mode -1)
+
+  (setq visible-bell t)
+
+  (global-visual-line-mode t)
+
+  (set-frame-parameter (selected-frame) 'alpha m2/frame-transparency)
+  (add-to-list 'default-frame-alist `(alpha . ,m2/frame-transparency))
+  (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+  (set-face-attribute 'default nil
+                      :font "CaskaydiaCove Nerd Font" :height m2/default-font-size)
+
+  (set-face-attribute 'fixed-pitch nil
+                      :font "CaskaydiaCove Nerd Font" :height m2/default-font-size)
+
+  (set-face-attribute 'variable-pitch nil
+                      :font "Cantarell" :height m2/default-variable-font-size
+                      :weight 'regular)
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    (setq evil-want-Y-yank-to-eol t)
+    (setq evil-split-window-below t)
+    (setq evil-vsplit-window-right t)
+    :config
+    (evil-mode 1)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
+
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (use-package general
+    :after evil
+    :config
+    (general-create-definer m2/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC")
+
+    (m2/leader-keys
+      "b" '(:ignore t :wk "Buffers")
+      "b b" '(ibuffer :wk "Ibuffer")
+      "b B" '(ibuffer-list-buffers :wk "Ibuffer list buffers")
+      "b n" '(next-buffer :wk "Next Buffer")
+      "b p" '(previous-buffer :wk "Previous Buffer")
+      "b K" '(kill-buffer :wk "Kill Buffer")))
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (with-eval-after-load 'org
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (python . t)))
+
+    (push '("conf-unix" . conf-unix) org-src-lang-modes))
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (use-package doom-themes
+    :config
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (load-theme 'doom-gruvbox t))
+
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-height 25
+          doom-modeline-bar-width 5
+          doom-modeline-persp-name t
+          doom-modeline-persp-icon t))
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (defun m2/org-babel-tangle-config ()
+    (when (string-equal (file-name-directory (buffer-file-name))
+                        (expand-file-name user-emacs-directory))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'m2/org-babel-tangle-config)))
+
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package ligature
+    :config
+    ;; Enable the "www" ligature in every possible major mode
+    (ligature-set-ligatures 't '("www"))
+    ;; Enable traditional ligature support in eww-mode, if the
+    ;; `variable-pitch' face supports it
+    (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+    ;; Enable all Cascadia and Fira Code ligatures in programming modes
+    (ligature-set-ligatures 'prog-mode
+                            '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
+                              ;; =:= =!=
+                              ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
+                              ;; ;; ;;;
+                              (";" (rx (+ ";")))
+                              ;; && &&&
+                              ("&" (rx (+ "&")))
+                              ;; !! !!! !. !: !!. != !== !~
+                              ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
+                              ;; ?? ??? ?:  ?=  ?.
+                              ("?" (rx (or ":" "=" "\." (+ "?"))))
+                              ;; %% %%%
+                              ("%" (rx (+ "%")))
+                              ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
+                              ;; |->>-||-<<-| |- |== ||=||
+                              ;; |==>>==<<==<=>==//==/=!==:===>
+                              ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
+                                              "-" "=" ))))
+                              ;; \\ \\\ \/
+                              ("\\" (rx (or "/" (+ "\\"))))
+                              ;; ++ +++ ++++ +>
+                              ("+" (rx (or ">" (+ "+"))))
+                              ;; :: ::: :::: :> :< := :// ::=
+                              (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
+                              ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
+                              ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
+                                              "="))))
+                              ;; .. ... .... .= .- .? ..= ..<
+                              ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
+                              ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
+                              ("-" (rx (+ (or ">" "<" "|" "~" "-"))))
+                              ;; *> */ *)  ** *** ****
+                              ("*" (rx (or ">" "/" ")" (+ "*"))))
+                              ;; www wwww
+                              ("w" (rx (+ "w")))
+                              ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
+                              ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
+                              ;; << <<< <<<<
+                              ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
+                                              "-"  "/" "|" "="))))
+                              ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
+                              ;; >> >>> >>>>
+                              (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
+                              ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
+                              ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
+                                           (+ "#"))))
+                              ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
+                              ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
+                              ;; __ ___ ____ _|_ __|____|_
+                              ("_" (rx (+ (or "_" "|"))))
+                              ;; Fira code: 0xFF 0x12
+                              ("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
+                              ;; Fira code:
+                              "Fl"  "Tl"  "fi"  "fj"  "fl"  "ft"
+                              ;; The few not covered by the regexps.
+                              "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^="))
+    ;; Enables ligature checks globally in all buffers. You can also do it
+    ;; per mode with `ligature-mode'.
+    (global-ligature-mode t))
+#+end_src
+
+* Runtime Perfomance
+#+begin_src emacs-lisp
+
+  ;; Make gc pauses faster by decreasing the threshold.
+  (setq gc-cons-threshold (* 2 1024 1024))
+  (setq read-process-output-max (* 1024 1024))
+
+#+end_src
+
+* Magit
+#+begin_src emacs-lisp :lexical no
+
+  (use-package magit)
+
+#+end_src
+
+* Treesitter
+#+begin_src emacs-lisp
+
+  (setq treesit-language-source-alist
+        '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+          (c "https://github.com/tree-sitter/tree-sitter-c")
+          (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+          (cmake "https://github.com/uyha/tree-sitter-cmake")
+          (css "https://github.com/tree-sitter/tree-sitter-css")
+          (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+          (go "https://github.com/tree-sitter/tree-sitter-go")
+          (html "https://github.com/tree-sitter/tree-sitter-html")
+          (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+          (json "https://github.com/tree-sitter/tree-sitter-json")
+          (make "https://github.com/alemuller/tree-sitter-make")
+          (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+          (python "https://github.com/tree-sitter/tree-sitter-python")
+          (toml "https://github.com/tree-sitter/tree-sitter-toml")
+          (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+          (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+          (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+#+end_src
+** eshell
+#+begin_src emacs-lisp
+
+  (defun m2/configure-eshell ()
+    (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+    (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+    (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history)
+    (evil-define-key '(normal insert visual) eshell-mode-map (kbd "<home>") 'eshell-bol)
+    (evil-normalize-keymaps)
+    (setq eshell-history-size 10000
+	  eshell-buffer-maximum-lines 10000
+	  eshell-hist-ignoredups t
+	  eshell-scroll-to-bottom-on-input t))
+
+  (use-package eshell
+    :elpaca nil
+    :hook ((eshell-first-time-mode . m2/configure-eshell)
+	   (eshell-first-time-mode . eat-eshell-mode)
+	   (eshell-first-time-mode . eat-eshell-visual-command-mode))
+    :config
+    (with-eval-after-load 'esh-opt
+      (setq eshell-destroy-buffer-when-process-dies t))
+    (eshell-git-prompt-use-theme 'powerline))
+
+#+end_src
+*** Eshell Colors
+#+begin_src emacs-lisp
+  (use-package eshell-syntax-highlighting
+    :after esh-mode
+    :config
+    (eshell-syntax-highlighting-global-mode +1))
+
+  (use-package eshell-git-prompt
+    :after eshell)
+#+end_src
+*** Eat
+#+begin_src emacs-lisp :lexical no
+
+  (use-package eat
+    :config
+    (setq eat-kill-buffer-on-exit t)
+    (setq eshell-visual-command '()))
+
+  (with-eval-after-load 'eshell
+    (eat-eshell-mode +1)
+    (eat-eshell-visual-command-mode +1))
+
+#+end_src
+*** Eshell Toggle
+#+begin_src emacs-lisp :lexical no
+
+  (use-package eshell-toggle
+    :custom
+    (esheel-toggle-window-side 'below)
+    (eshell-toggle-use-projectile-root t)
+    (eshell-toggle-run-command nil)
+    :bind
+    ("C-/" . eshell-toggle))
+
+#+end_src
+* Dired
+** Configuration
+#+begin_src emacs-lisp
+
+  (use-package dired
+    :elpaca nil
+    :commands (dired dired-jump)
+    :bind (("C-x C-j" . dired-jump))
+    :custom ((dired-listing-switches "-agho --group-directories-first"))
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+      "h" 'dired-single-up-directory
+      "l" 'dired-single-buffer))
+
+  (use-package dired-single
+    :commands (dired dired-jump))
+
+  (use-package dired-hide-dotfiles
+    :hook (dired-mode . dired-hide-dotfiles-mode)
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+      "H" 'dired-hide-dotfiles-mode))
+
+#+end_src
+
+#+RESULTS:
+
+* Whick Key
+#+begin_src emacs-lisp
+
+  (use-package which-key
+    :defer 0
+    :diminish which-key-mode
+    :config
+    (setq which-key-prefix-prefix "◉ ")
+    (setq which-key-idle-delay 1)
+    (setq which-key-min-display-lines 3)
+    (setq which-key-max-display-columns nil)
+    (which-key-mode))
+
+#+end_src
