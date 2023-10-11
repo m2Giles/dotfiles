@@ -274,6 +274,32 @@
     ;; per mode with `ligature-mode'.
     (global-ligature-mode t))
 #+end_src
+* Line Numbers
+#+begin_src emacs-lisp
+
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  pdf-view-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+  (add-hook 'prog-mode-hook (lambda () (setq display-line-numbers 'relative)))
+  (add-hook 'emacs-lisp-mode-hook (lambda () (setq display-line-numbers 'relative)))
+
+#+end_src
+* Icons
+#+begin_src emacs-lisp :lexical no
+
+  (use-package all-the-icons)
+
+  (use-package all-the-icons-completion
+    :after (marginalia all-the-icons)
+    :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+    :init
+    (all-the-icons-completion-mode))
+
+#+end_src
 * Evil
 #+begin_src emacs-lisp
 
@@ -537,9 +563,6 @@
 
 #+end_src
 
-#+RESULTS:
-| bash | c | cpp | cmake | css | elisp | go | html | javascript | json | make | markdown | python | toml | tsx | typescript | yaml |
-
 **** Treesitter Remap Major-Mode
 #+begin_src emacs-lisp :lexical no
 
@@ -621,6 +644,7 @@
     :after org-mode)
 
 #+end_src
+*** Julia
 *** C
 #+begin_src emacs-lisp
 
@@ -650,6 +674,7 @@
                        #'cape-keyword
                        #'elisp-completion-at-point
                        #'cape-file))))
+
   (use-package lisp-mode
     :elpaca nil
     :after cape
@@ -907,7 +932,7 @@
   (use-package cape
     :config
     (setq cape-dabbrev-check-other-buffers nil
-          cape-dabbrev-min-length 6)
+          cape-dabbrev-min-length 6))
 
     (use-package yasnippet-capf
       :after cape)
@@ -965,9 +990,19 @@
 ** Setup Org-Mode
 #+begin_src emacs-lisp
 
+    (defun m2/org-mode-setup ()
+      (org-indent-mode)
+      (variable-pitch-mode 1)
+      (visual-line-mode 1)
+      (setq-local completion-at-point-functions
+                  (list (cape-super-capf
+                         (cape-company-to-capf #'company-org-block)
+                         #'cape-elisp-block
+                         #'yasnippet-capf
+                         #'cape-file
+                         #'cape-dabbrev))))
 
 #+end_src
-
 ** Org-Mode Fonts
 #+begin_src emacs-lisp
 
@@ -1004,20 +1039,6 @@
 #+end_src
 ** Org-Mode
 #+begin_src emacs-lisp
-
-    (defun m2/org-mode-setup ()
-      (org-indent-mode)
-      (variable-pitch-mode 1)
-      (visual-line-mode 1)
-      (setq-local completion-at-point-functions
-                  (list (cape-super-capf
-                         (cape-company-to-capf #'company-org-block)
-                         #'cape-elisp-block
-                         #'yasnippet-capf
-                         #'cape-file
-                         #'cape-dabbrev)))))
-
-
 
   (use-package org
     :elpaca nil
@@ -1084,7 +1105,6 @@
 #+end_src
 
 * Hydra
-** Install Hydra
 #+begin_src emacs-lisp
 
   (use-package hydra
@@ -1176,7 +1196,6 @@
   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'m2/org-babel-tangle-config)))
 
 #+end_src
-
 * Runtime Perfomance
 #+begin_src emacs-lisp
 
