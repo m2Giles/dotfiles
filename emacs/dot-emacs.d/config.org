@@ -9,8 +9,7 @@
   (defvar m2/frame-transparency '(95 . 95))
   (setq lsp-use-plists t)
   (setenv "LSP_USE_PLISTS" "1")
-  (setq vc-follow-symlinks t)
-
+  
 #+end_src
 * Startup Perfomance
 #+begin_src emacs-lisp
@@ -90,81 +89,84 @@
 * General
 #+begin_src emacs-lisp
 
-  (use-package general
-    :demand t
-    :config
-    (general-create-definer m2/leader-keys
-      :keymaps '(normal insert visual emacs)
-      :prefix "SPC"
-      :global-prefix "C-SPC")
+    (use-package general
+      :demand t
+      :config
+      (general-create-definer m2/leader-keys
+        :keymaps '(normal insert visual emacs)
+        :prefix "SPC"
+        :global-prefix "C-SPC")
 
-    (m2/leader-keys
-      "b" '(:ignore t :wk "Buffers")
-      "b b" '(consult-buffer :wk "Ibuffer")
-      "b B" '(ibuffer-list-buffers :wk "Ibuffer list buffers")
-      "b n" '(next-buffer :wk "Next Buffer")
-      "b p" '(previous-buffer :wk "Previous Buffer")
-      "b K" '(kill-buffer :wk "Kill Buffer"))
+      (m2/leader-keys
+        "b" '(:ignore t :wk "Buffers")
+        "b b" '(consult-buffer :wk "Ibuffer")
+        "b B" '(ibuffer-list-buffers :wk "Ibuffer list buffers")
+        "b n" '(next-buffer :wk "Next Buffer")
+        "b p" '(previous-buffer :wk "Previous Buffer")
+        "b K" '(kill-buffer :wk "Kill Buffer"))
 
-    (m2/leader-keys
-      "f" '(:ignore t :wk "Files")
-      "f c" '((lambda () (interactive)
-		(find-file (concat (expand-file-name user-emacs-directory) "config.org")))
-	      :wk "Open Emacs config.org")
-      "f e" '((lambda () (interactive)
-		(dired user-emacs-directory))
-	      :wk "Open user-emacs-directory in Dired")
-      "f f" '(find-file :wk "Find Files")
-      "f r" '(recentf :wk "Find Recent Files")
-      "f g" '(consult-ripgrep :wk "Grep")
-      "d" '(dired :wk "Dired")
-      "e" '(treemacs :wk "Treemacs"))
+      (m2/leader-keys
+        "f" '(:ignore t :wk "Files")
+        "f c" '((lambda () (interactive)
+                  (find-file (concat (expand-file-name user-emacs-directory) "config.org")))
+                :wk "Open Emacs config.org")
+        "f e" '((lambda () (interactive)
+                  (dired user-emacs-directory))
+                :wk "Open user-emacs-directory in Dired")
+        "f f" '(find-file :wk "Find Files")
+        "f r" '(recentf :wk "Find Recent Files")
+        "f g" '(consult-ripgrep :wk "Grep")
+        "d" '(dired :wk "Dired")
+        "e" '(treemacs :wk "Treemacs"))
 
-    (m2/leader-keys
-      "h" '(:ignore t :wk "Helpful")
-      "h h" '(helpful-at-point :wk "Helpful Here")
-      "h f" '(helpful-callable :wk "Helpful Callable")
-      "h v" '(helpful-variable :wk "Helpful Variable")
-      "h k" '(helpful-key :wk "Helpful Key")
-      "h c" '(helpful-command :wk "Helpful Command"))
+      (m2/leader-keys
+        "h" '(:ignore t :wk "Helpful")
+        "h h" '(helpful-at-point :wk "Helpful Here")
+        "h f" '(helpful-callable :wk "Helpful Callable")
+        "h v" '(helpful-variable :wk "Helpful Variable")
+        "h k" '(helpful-key :wk "Helpful Key")
+        "h c" '(helpful-command :wk "Helpful Command"))
 
-    (m2/leader-keys
-      "c" '(:ignore t :wk "Code")
-      "c ." '(lsp-describe-thing-at-point :wk "Describe")
-      "c a" '(lsp-execute-code-action :wk "Rename")
-      "c f" '(lsp-format-buffer :wk "Format Buffer")
-      "c d" '(dap-hydra t :wk "debugger")
-      "c r" '(lsp-rename :wk "Rename"))
+      (m2/leader-keys
+        "c" '(:ignore t :wk "Code")
+        "c ." '(lsp-describe-thing-at-point :wk "Describe")
+        "c a" '(lsp-execute-code-action :wk "Rename")
+        "c f" '(lsp-format-buffer :wk "Format Buffer")
+        "c d" '(dap-hydra t :wk "debugger")
+        "c r" '(lsp-rename :wk "Rename"))
 
-    (m2/leader-keys
-      "g" '(:ignore t :wk "Git")
-      "g /" '(magit-dispatch :wk "Magit Dispatch")
-      "g ." '(magit-file-dispatch :wk "Magit File Dispatch")
-      "g b" '(magit-branch-checkout :wk "Switch Branch")
-      "g c" '(:ignore t :wk "Create")
-      "g c b" '(magit-branch-and-checkout :wk "Create Branch and Checkout")
-      "g c c" '(magit-commit-create :wk "Create Commit")
-      "g c f" '(magit-commit-fixup :wk "Create Fixup Commit")
-      "g C" '(magit-clone :wk "Clone Repo")
-      "g f" '(:ignore t :wk "Find")
-      "g f c" '(magit-show-commit :wk "Show commit")
-      "g f f" '(magit-find-file :wk "Magit find file")
-      "g f g" '(magit-find-git-config-file :wk "Find gitconfig file")
-      "g F" '(magit-fetch :wk "Git fetch")
-      "g g" '(magit-status :wk "Magit status")
-      "g i" '(magit-init :wk "Initialize git repo")
-      "g l" '(magit-log-buffer-file :wk "Magit buffer log")
-      "g r" '(vc-revert :wk "Git revert file")
-      "g s" '(magit-stage-file :wk "Git stage file")
-      "g u" '(magit-stage-file :wk "Git unstage file"))
+      (m2/leader-keys
+        "g" '(:ignore t :wk "Git")
+        "g /" '(magit-dispatch :wk "Magit Dispatch")
+        "g ." '(magit-file-dispatch :wk "Magit File Dispatch")
+        "g b" '(magit-branch-checkout :wk "Switch Branch")
+        "g c" '(:ignore t :wk "Create")
+        "g c b" '(magit-branch-and-checkout :wk "Create Branch and Checkout")
+        "g c c" '(magit-commit-create :wk "Create Commit")
+        "g c f" '(magit-commit-fixup :wk "Create Fixup Commit")
+        "g C" '(magit-clone :wk "Clone Repo")
+        "g f" '(:ignore t :wk "Find")
+        "g f c" '(magit-show-commit :wk "Show commit")
+        "g f f" '(magit-find-file :wk "Magit find file")
+        "g f g" '(magit-find-git-config-file :wk "Find gitconfig file")
+        "g F" '(magit-fetch :wk "Git fetch")
+        "g g" '(magit-status :wk "Magit status")
+        "g i" '(magit-init :wk "Initialize git repo")
+        "g l" '(magit-log-buffer-file :wk "Magit buffer log")
+        "g r" '(vc-revert :wk "Git revert file")
+        "g s" '(magit-stage-file :wk "Git stage file")
+        "g u" '(magit-stage-file :wk "Git unstage file"))
 
-    (m2/leader-keys
-      "t" '(:ignore t :wk "Terminals")
-      "t e" '(eshell-toggle :wk "Toggle Eshell")
-      "t t" '(eat :wk "Create Eat Terminal"))
-    )
+      (m2/leader-keys
+        "t" '(:ignore t :wk "Terminals")
+        "t e" '(eshell-toggle :wk "Toggle Eshell")
+        "t t" '(eat :wk "Create Eat Terminal"))
 
-  (elpaca-wait)
+      (general-create-definer completions-def
+        :prefix "C-x")
+      )
+
+    (elpaca-wait)
 #+end_src
 * UI
 #+begin_src emacs-lisp
@@ -329,6 +331,9 @@
     :after evil
     :config
     (evil-collection-init))
+
+  (use-package evil-commentary
+    :after evil)
 
 #+end_src
 
@@ -902,30 +907,43 @@
 
 #+begin_src emacs-lisp
 
-  (use-package corfu
-    :demand t
-    :init
-    (global-corfu-mode)
-    (setq corfu-popupinfo-delay 0.2)
-    (corfu-popupinfo-mode)
-    :bind (:map corfu-map
-		("C-n" . corfu-next)
-		("C-p" . corfu-previous)
-		("C-j" . corfu-popupinfo-scroll-down)
-		("C-k" . corfu-popupinfo-scroll-up)
-		("M-d" . corfu-info-documentation)
-		("<escape>" . evil-collection-corfu-quit-and-escape))
-    :config
-    (setq corfu-auto t
-	  corfu-auto-delay 0.1
-	  corfu-auto-prefix 1
-	  corfu-echo-documentation t
-	  corfu-scroll-margin 0
-	  corfu-count 8
-	  corfu-max-width 50
-	  corfu-min-width corfu-max-width))
+      (use-package corfu
+        :demand t
+        :init
+        (setq corfu-popupinfo-delay 0.2)
+        (corfu-popupinfo-mode)
+        :bind (:map corfu-map
+                    ("C-n" . corfu-next)
+                    ("C-p" . corfu-previous)
+                    ("C-j" . corfu-popupinfo-scroll-down)
+                    ("C-k" . corfu-popupinfo-scroll-up)
+                    ("M-d" . corfu-info-documentation)
+                    ("<escape>" . evil-collection-corfu-quit-and-escape))
+        :config
+        (global-corfu-mode)
+        (setq corfu-auto-delay 0.1
+              corfu-auto-prefix 1
+              corfu-echo-documentation t
+              corfu-cycle t
+              corfu-auto t
+              corfu-scroll-margin 0
+              corfu-count 8
+              corfu-max-width 50
+              corfu-preselect 'directory
+              corfu-min-width corfu-max-width
+              tab-always-indent 'complete))
 
-#+end_src
+    (defun corfu-send-shell (&rest _)
+      "Send completion candidate when inside comint/eshell."
+      (cond
+       ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
+        (eshell-send-input))
+       ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
+        (comint-send-input))))
+
+    (advice-add #'corfu-insert :after #'corfu-send-shell)
+
+    #+end_src
 ** CAPE
 #+begin_src emacs-lisp
 
@@ -934,10 +952,10 @@
     (setq cape-dabbrev-check-other-buffers nil
           cape-dabbrev-min-length 6))
 
-    (use-package yasnippet-capf
-      :after cape)
+  (use-package yasnippet-capf
+    :after cape)
 
-          #+end_src
+#+end_src
 ** Kind-Icons
 #+begin_src emacs-lisp
 
@@ -990,17 +1008,17 @@
 ** Setup Org-Mode
 #+begin_src emacs-lisp
 
-    (defun m2/org-mode-setup ()
-      (org-indent-mode)
-      (variable-pitch-mode 1)
-      (visual-line-mode 1)
-      (setq-local completion-at-point-functions
-                  (list (cape-super-capf
-                         (cape-company-to-capf #'company-org-block)
-                         #'cape-elisp-block
-                         #'yasnippet-capf
-                         #'cape-file
-                         #'cape-dabbrev))))
+  (defun m2/org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (visual-line-mode 1)
+    (setq-local completion-at-point-functions
+                (list (cape-super-capf
+                       (cape-company-to-capf #'company-org-block)
+                       #'cape-elisp-block
+                       #'yasnippet-capf
+                       #'cape-file
+                       #'cape-dabbrev))))
 
 #+end_src
 ** Org-Mode Fonts
@@ -1063,7 +1081,7 @@
 
   (defun m2/org-mode-visual-fill ()
     (setq visual-fill-column-width 100
-	  visual-fill-column-center-text t)
+          visual-fill-column-center-text t)
     (visual-fill-column-mode 1))
 
   (use-package visual-fill-column
@@ -1086,9 +1104,9 @@
 #+begin_src emacs-lisp
 
   (add-hook 'org-mode-hook (lambda ()
-			     (setq-local electric-pair-inhibit-predicate
-					 `(lambda (c)
-					    (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+                             (setq-local electric-pair-inhibit-predicate
+                                         `(lambda (c)
+                                            (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
 
 #+end_src
 ** Configure Babel Languages
@@ -1163,6 +1181,23 @@
       ("<up>" windresize-up)
 
       ("q" nil)))
+#+end_src
+* TRAMP
+** Distrobox Support
+#+begin_src emacs-lisp :lexical no
+
+  (use-package tramp
+               :elpaca nil
+               :config
+               (push
+                (cons
+                 "distrobox"
+                 '((tramp-login-program "distrobox")
+                   (tramp-login-args (("enter") ("%h")))
+                   (tramp-remote-shell "/bin/sh")
+                   (tramp-remote-shell-args ("-i") ("-c"))))
+                tramp-methods))
+
 #+end_src
 * Super Save
 #+begin_src emacs-lisp
