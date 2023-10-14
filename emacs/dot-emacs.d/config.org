@@ -9,7 +9,7 @@
   (defvar m2/frame-transparency '(95 . 95))
   (setq lsp-use-plists t)
   (setenv "LSP_USE_PLISTS" "1")
-  
+
 #+end_src
 * Startup Perfomance
 #+begin_src emacs-lisp
@@ -18,10 +18,10 @@
 
   (defun m2/display-startup-time ()
     (message "Emacs loaded in %s with %d garbage collections."
-	     (format "%.2f seconds"
-		     (float-time
-		      (time-subtract after-init-time before-init-time)))
-	     gcs-done))
+             (format "%.2f seconds"
+                     (float-time
+                      (time-subtract after-init-time before-init-time)))
+             gcs-done))
 
   (add-hook 'emacs-startup-hook #'m2/display-startup-time)
 
@@ -34,31 +34,31 @@
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
   (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-				:ref nil
-				:files (:defaults (:exclude "extensions"))
-				:build (:not elpaca--activate-package)))
+                                :ref nil
+                                :files (:defaults (:exclude "extensions"))
+                                :build (:not elpaca--activate-package)))
   (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-	 (build (expand-file-name "elpaca/" elpaca-builds-directory))
-	 (order (cdr elpaca-order))
-	 (default-directory repo))
+         (build (expand-file-name "elpaca/" elpaca-builds-directory))
+         (order (cdr elpaca-order))
+         (default-directory repo))
     (add-to-list 'load-path (if (file-exists-p build) build repo))
     (unless (file-exists-p repo)
       (make-directory repo t)
       (when (< emacs-major-version 28) (require 'subr-x))
       (condition-case-unless-debug err
-	  (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-		   ((zerop (call-process "git" nil buffer t "clone"
-					 (plist-get order :repo) repo)))
-		   ((zerop (call-process "git" nil buffer t "checkout"
-					 (or (plist-get order :ref) "--"))))
-		   (emacs (concat invocation-directory invocation-name))
-		   ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-					 "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-		   ((require 'elpaca))
-		   ((elpaca-generate-autoloads "elpaca" repo)))
-	      (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-	    (error "%s" (with-current-buffer buffer (buffer-string))))
-	((error) (warn "%s" err) (delete-directory repo 'recursive))))
+          (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                   ((zerop (call-process "git" nil buffer t "clone"
+                                         (plist-get order :repo) repo)))
+                   ((zerop (call-process "git" nil buffer t "checkout"
+                                         (or (plist-get order :ref) "--"))))
+                   (emacs (concat invocation-directory invocation-name))
+                   ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                         "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                   ((require 'elpaca))
+                   ((elpaca-generate-autoloads "elpaca" repo)))
+              (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+            (error "%s" (with-current-buffer buffer (buffer-string))))
+        ((error) (warn "%s" err) (delete-directory repo 'recursive))))
     (unless (require 'elpaca-autoloads nil t)
       (require 'elpaca)
       (elpaca-generate-autoloads "elpaca" repo)
@@ -89,84 +89,82 @@
 * General
 #+begin_src emacs-lisp
 
-    (use-package general
-      :demand t
-      :config
-      (general-create-definer m2/leader-keys
-        :keymaps '(normal insert visual emacs)
-        :prefix "SPC"
-        :global-prefix "C-SPC")
+  (use-package general
+    :demand t
+    :config
+    (general-create-definer m2/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC")
 
-      (m2/leader-keys
-        "b" '(:ignore t :wk "Buffers")
-        "b b" '(consult-buffer :wk "Ibuffer")
-        "b B" '(ibuffer-list-buffers :wk "Ibuffer list buffers")
-        "b n" '(next-buffer :wk "Next Buffer")
-        "b p" '(previous-buffer :wk "Previous Buffer")
-        "b K" '(kill-buffer :wk "Kill Buffer"))
+    (m2/leader-keys
+      "b" '(:ignore t :wk "Buffers")
+      "b b" '(consult-buffer :wk "Ibuffer")
+      "b B" '(ibuffer-list-buffers :wk "Ibuffer list buffers")
+      "b n" '(next-buffer :wk "Next Buffer")
+      "b p" '(previous-buffer :wk "Previous Buffer")
+      "b K" '(kill-buffer :wk "Kill Buffer")
+      "b d" '(evil-delete-buffer :wk "Delete Buffer"))
 
-      (m2/leader-keys
-        "f" '(:ignore t :wk "Files")
-        "f c" '((lambda () (interactive)
-                  (find-file (concat (expand-file-name user-emacs-directory) "config.org")))
-                :wk "Open Emacs config.org")
-        "f e" '((lambda () (interactive)
-                  (dired user-emacs-directory))
-                :wk "Open user-emacs-directory in Dired")
-        "f f" '(find-file :wk "Find Files")
-        "f r" '(recentf :wk "Find Recent Files")
-        "f g" '(consult-ripgrep :wk "Grep")
-        "d" '(dired :wk "Dired")
-        "e" '(treemacs :wk "Treemacs"))
+    (m2/leader-keys
+      "f" '(:ignore t :wk "Files")
+      "f c" '((lambda () (interactive)
+                (find-file (concat (expand-file-name user-emacs-directory) "config.org")))
+              :wk "Open Emacs config.org")
+      "f e" '((lambda () (interactive)
+                (dired user-emacs-directory))
+              :wk "Open user-emacs-directory in Dired")
+      "f f" '(find-file :wk "Find Files")
+      "f r" '(recentf :wk "Find Recent Files")
+      "f g" '(consult-ripgrep :wk "Grep")
+      "d" '(dired :wk "Dired")
+      "e" '(treemacs :wk "Treemacs"))
 
-      (m2/leader-keys
-        "h" '(:ignore t :wk "Helpful")
-        "h h" '(helpful-at-point :wk "Helpful Here")
-        "h f" '(helpful-callable :wk "Helpful Callable")
-        "h v" '(helpful-variable :wk "Helpful Variable")
-        "h k" '(helpful-key :wk "Helpful Key")
-        "h c" '(helpful-command :wk "Helpful Command"))
+    (m2/leader-keys
+      "h" '(:ignore t :wk "Helpful")
+      "h h" '(helpful-at-point :wk "Helpful Here")
+      "h f" '(helpful-callable :wk "Helpful Callable")
+      "h v" '(helpful-variable :wk "Helpful Variable")
+      "h k" '(helpful-key :wk "Helpful Key")
+      "h c" '(helpful-command :wk "Helpful Command"))
 
-      (m2/leader-keys
-        "c" '(:ignore t :wk "Code")
-        "c ." '(lsp-describe-thing-at-point :wk "Describe")
-        "c a" '(lsp-execute-code-action :wk "Rename")
-        "c f" '(lsp-format-buffer :wk "Format Buffer")
-        "c d" '(dap-hydra t :wk "debugger")
-        "c r" '(lsp-rename :wk "Rename"))
+    (m2/leader-keys
+      "c" '(:ignore t :wk "Code")
+      "c ." '(lsp-describe-thing-at-point :wk "Describe")
+      "c a" '(lsp-execute-code-action :wk "Rename")
+      "c f" '(lsp-format-buffer :wk "Format Buffer")
+      "c d" '(dap-hydra t :wk "debugger")
+      "c r" '(lsp-rename :wk "Rename"))
 
-      (m2/leader-keys
-        "g" '(:ignore t :wk "Git")
-        "g /" '(magit-dispatch :wk "Magit Dispatch")
-        "g ." '(magit-file-dispatch :wk "Magit File Dispatch")
-        "g b" '(magit-branch-checkout :wk "Switch Branch")
-        "g c" '(:ignore t :wk "Create")
-        "g c b" '(magit-branch-and-checkout :wk "Create Branch and Checkout")
-        "g c c" '(magit-commit-create :wk "Create Commit")
-        "g c f" '(magit-commit-fixup :wk "Create Fixup Commit")
-        "g C" '(magit-clone :wk "Clone Repo")
-        "g f" '(:ignore t :wk "Find")
-        "g f c" '(magit-show-commit :wk "Show commit")
-        "g f f" '(magit-find-file :wk "Magit find file")
-        "g f g" '(magit-find-git-config-file :wk "Find gitconfig file")
-        "g F" '(magit-fetch :wk "Git fetch")
-        "g g" '(magit-status :wk "Magit status")
-        "g i" '(magit-init :wk "Initialize git repo")
-        "g l" '(magit-log-buffer-file :wk "Magit buffer log")
-        "g r" '(vc-revert :wk "Git revert file")
-        "g s" '(magit-stage-file :wk "Git stage file")
-        "g u" '(magit-stage-file :wk "Git unstage file"))
+    (m2/leader-keys
+      "g" '(:ignore t :wk "Git")
+      "g /" '(magit-dispatch :wk "Magit Dispatch")
+      "g ." '(magit-file-dispatch :wk "Magit File Dispatch")
+      "g b" '(magit-branch-checkout :wk "Switch Branch")
+      "g c" '(:ignore t :wk "Create")
+      "g c b" '(magit-branch-and-checkout :wk "Create Branch and Checkout")
+      "g c c" '(magit-commit-create :wk "Create Commit")
+      "g c f" '(magit-commit-fixup :wk "Create Fixup Commit")
+      "g C" '(magit-clone :wk "Clone Repo")
+      "g f" '(:ignore t :wk "Find")
+      "g f c" '(magit-show-commit :wk "Show commit")
+      "g f f" '(magit-find-file :wk "Magit find file")
+      "g f g" '(magit-find-git-config-file :wk "Find gitconfig file")
+      "g F" '(magit-fetch :wk "Git fetch")
+      "g g" '(magit-status :wk "Magit status")
+      "g i" '(magit-init :wk "Initialize git repo")
+      "g l" '(magit-log-buffer-file :wk "Magit buffer log")
+      "g r" '(vc-revert :wk "Git revert file")
+      "g s" '(magit-stage-file :wk "Git stage file")
+      "g u" '(magit-stage-file :wk "Git unstage file"))
 
-      (m2/leader-keys
-        "t" '(:ignore t :wk "Terminals")
-        "t e" '(eshell-toggle :wk "Toggle Eshell")
-        "t t" '(eat :wk "Create Eat Terminal"))
+    (m2/leader-keys
+      "t" '(:ignore t :wk "Terminals")
+      "t e" '(eshell-toggle :wk "Toggle Eshell")
+      "t t" '(eat :wk "Create Eat Terminal"))
+    )
 
-      (general-create-definer completions-def
-        :prefix "C-x")
-      )
-
-    (elpaca-wait)
+  (elpaca-wait)
 #+end_src
 * UI
 #+begin_src emacs-lisp
@@ -195,14 +193,14 @@
 #+begin_src emacs-lisp
 
   (set-face-attribute 'default nil
-		      :font "CaskaydiaCove Nerd Font" :height m2/default-font-size)
+                      :font "CaskaydiaCove Nerd Font" :height m2/default-font-size)
 
   (set-face-attribute 'fixed-pitch nil
-		      :font "CaskaydiaCove Nerd Font" :height m2/default-font-size)
+                      :font "CaskaydiaCove Nerd Font" :height m2/default-font-size)
 
   (set-face-attribute 'variable-pitch nil
-		      :font "Cantarell" :height m2/default-variable-font-size
-		      :weight 'regular)
+                      :font "Cantarell" :height m2/default-variable-font-size
+                      :weight 'regular)
 
 #+end_src
 * Ligatures
@@ -216,62 +214,62 @@
     (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
     ;; Enable all Cascadia and Fira Code ligatures in programming modes
     (ligature-set-ligatures 'prog-mode
-			    '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
-			      ;; =:= =!=
-			      ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
-			      ;; ;; ;;;
-			      (";" (rx (+ ";")))
-			      ;; && &&&
-			      ("&" (rx (+ "&")))
-			      ;; !! !!! !. !: !!. != !== !~
-			      ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
-			      ;; ?? ??? ?:  ?=  ?.
-			      ("?" (rx (or ":" "=" "\." (+ "?"))))
-			      ;; %% %%%
-			      ("%" (rx (+ "%")))
-			      ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
-			      ;; |->>-||-<<-| |- |== ||=||
-			      ;; |==>>==<<==<=>==//==/=!==:===>
-			      ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
-					      "-" "=" ))))
-			      ;; \\ \\\ \/
-			      ("\\" (rx (or "/" (+ "\\"))))
-			      ;; ++ +++ ++++ +>
-			      ("+" (rx (or ">" (+ "+"))))
-			      ;; :: ::: :::: :> :< := :// ::=
-			      (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
-			      ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
-			      ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
-					      "="))))
-			      ;; .. ... .... .= .- .? ..= ..<
-			      ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
-			      ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
-			      ("-" (rx (+ (or ">" "<" "|" "~" "-"))))
-			      ;; *> */ *)  ** *** ****
-			      ("*" (rx (or ">" "/" ")" (+ "*"))))
-			      ;; www wwww
-			      ("w" (rx (+ "w")))
-			      ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
-			      ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
-			      ;; << <<< <<<<
-			      ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
-					      "-"  "/" "|" "="))))
-			      ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
-			      ;; >> >>> >>>>
-			      (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
-			      ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
-			      ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
-					   (+ "#"))))
-			      ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
-			      ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
-			      ;; __ ___ ____ _|_ __|____|_
-			      ("_" (rx (+ (or "_" "|"))))
-			      ;; Fira code: 0xFF 0x12
-			      ("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
-			      ;; Fira code:
-			      "Fl"  "Tl"  "fi"  "fj"  "fl"  "ft"
-			      ;; The few not covered by the regexps.
-			      "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^="))
+                            '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
+                              ;; =:= =!=
+                              ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
+                              ;; ;; ;;;
+                              (";" (rx (+ ";")))
+                              ;; && &&&
+                              ("&" (rx (+ "&")))
+                              ;; !! !!! !. !: !!. != !== !~
+                              ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
+                              ;; ?? ??? ?:  ?=  ?.
+                              ("?" (rx (or ":" "=" "\." (+ "?"))))
+                              ;; %% %%%
+                              ("%" (rx (+ "%")))
+                              ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
+                              ;; |->>-||-<<-| |- |== ||=||
+                              ;; |==>>==<<==<=>==//==/=!==:===>
+                              ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
+                                              "-" "=" ))))
+                              ;; \\ \\\ \/
+                              ("\\" (rx (or "/" (+ "\\"))))
+                              ;; ++ +++ ++++ +>
+                              ("+" (rx (or ">" (+ "+"))))
+                              ;; :: ::: :::: :> :< := :// ::=
+                              (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
+                              ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
+                              ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
+                                              "="))))
+                              ;; .. ... .... .= .- .? ..= ..<
+                              ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
+                              ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
+                              ("-" (rx (+ (or ">" "<" "|" "~" "-"))))
+                              ;; *> */ *)  ** *** ****
+                              ("*" (rx (or ">" "/" ")" (+ "*"))))
+                              ;; www wwww
+                              ("w" (rx (+ "w")))
+                              ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
+                              ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
+                              ;; << <<< <<<<
+                              ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
+                                              "-"  "/" "|" "="))))
+                              ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
+                              ;; >> >>> >>>>
+                              (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
+                              ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
+                              ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
+                                           (+ "#"))))
+                              ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
+                              ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
+                              ;; __ ___ ____ _|_ __|____|_
+                              ("_" (rx (+ (or "_" "|"))))
+                              ;; Fira code: 0xFF 0x12
+                              ("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
+                              ;; Fira code:
+                              "Fl"  "Tl"  "fi"  "fj"  "fl"  "ft"
+                              ;; The few not covered by the regexps.
+                              "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^="))
     ;; Enables ligature checks globally in all buffers. You can also do it
     ;; per mode with `ligature-mode'.
     (global-ligature-mode t))
@@ -333,7 +331,9 @@
     (evil-collection-init))
 
   (use-package evil-commentary
-    :after evil)
+    :after evil
+    :config
+    (evil-commentary-mode))
 
 #+end_src
 
@@ -357,16 +357,16 @@
   (use-package doom-themes
     :config
     (setq doom-themes-enable-bold t
-	  doom-themes-enable-italic t)
+          doom-themes-enable-italic t)
     (load-theme 'doom-gruvbox t))
 
   (use-package doom-modeline
     :init (doom-modeline-mode 1)
     :config
     (setq doom-modeline-height 25
-	  doom-modeline-bar-width 5
-	  doom-modeline-persp-name t
-	  doom-modeline-persp-icon t))
+          doom-modeline-bar-width 5
+          doom-modeline-persp-name t
+          doom-modeline-persp-icon t))
 
 #+end_src
 * Terminals
@@ -380,15 +380,15 @@
     (evil-define-key '(normal insert visual) eshell-mode-map (kbd "<home>") 'eshell-bol)
     (evil-normalize-keymaps)
     (setq eshell-history-size 10000
-	  eshell-buffer-maximum-lines 10000
-	  eshell-hist-ignoredups t
-	  eshell-scroll-to-bottom-on-input t))
+          eshell-buffer-maximum-lines 10000
+          eshell-hist-ignoredups t
+          eshell-scroll-to-bottom-on-input t))
 
   (use-package eshell
     :elpaca nil
     :hook ((eshell-first-time-mode . m2/configure-eshell)
-	   (eshell-first-time-mode . eat-eshell-mode)
-	   (eshell-first-time-mode . eat-eshell-visual-command-mode))
+           (eshell-first-time-mode . eat-eshell-mode)
+           (eshell-first-time-mode . eat-eshell-visual-command-mode))
     :config
     (with-eval-after-load 'esh-opt
       (setq eshell-destroy-buffer-when-process-dies t))
@@ -411,6 +411,11 @@
   (use-package eat
     :config
     (setq eat-kill-buffer-on-exit t)
+    (defvar eat--prevent-use-package-config-recursion nil)
+    (unless eat--prevent-use-package-config-recursion
+      (unless eat--prevent-use-package-config-recursion t)
+      (eat-reload))
+    (makunbound 'eat--prevent-use-package-config-recursion)
     (setq eshell-visual-command '()))
 
   (with-eval-after-load 'eshell
@@ -427,7 +432,13 @@
     (eshell-toggle-use-projectile-root t)
     (eshell-toggle-run-command nil)
     :bind
-    ("C-/" . eshell-toggle))
+    ("C-|" . eshell-toggle))
+
+#+end_src
+** VTerm
+#+begin_src emacs-lisp :lexical no
+
+  (use-package vterm)
 
 #+end_src
 * Dired
@@ -457,19 +468,19 @@
 * Development
 ** Prog-Mode Hook
 #+begin_src emacs-lisp
-    (defun m2/prog-mode-setup ()
-      (setq-local completion-at-point-functions
-		  (list (cape-super-capf
-			 #'cape-file
-			 #'yasnippet-capf
-			 #'cape-keyword))))
+  (defun m2/prog-mode-setup ()
+    (setq-local completion-at-point-functions
+                (list (cape-capf-super
+                       #'cape-file
+                       #'yasnippet-capf
+                       #'cape-keyword))))
 
   (use-package prog-mode
     :elpaca nil
     :after cape
     :hook (prog-mode . m2/prog-mode-setup))
 
-			 #+end_src
+#+end_src
 ** IDE
 *** LSP Mode
 #+begin_src emacs-lisp
@@ -477,14 +488,14 @@
   (defun m2/lsp-mode-setup ()
     (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
     (setf (alist-get 'styles
-		     (alist-get 'lsp-capf completion-category-defaults))
-	  '(orderless))
+                     (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless))
     (lsp-headerline-breadcrumb-mode)
     (setq-local completion-at-point-functions
-		(list (cape-super-capf
-		       #'cape-file
-		       #'yasnippet-capf
-		       #'lsp-completion-at-point))))
+                (list (cape-capf-super
+                       #'cape-file
+                       #'yasnippet-capf
+                       #'lsp-completion-at-point))))
 
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
@@ -497,25 +508,25 @@
     (advice-add 'lsp-completion-at-point :around #'cape-wrap-buster)
     (advice-add 'cape-file :around #'cape-wrap-buster)
     :bind (:map lsp-mode-map
-		("C-c d" . lsp-describe-thing-at-point) 
-		("C-c a" . lsp-execute-code-action)
-		("C-c f" . lsp-format-buffer)
-		("C-c r" . lsp-rename))
+                ("C-c d" . lsp-describe-thing-at-point) 
+                ("C-c a" . lsp-execute-code-action)
+                ("C-c f" . lsp-format-buffer)
+                ("C-c r" . lsp-rename))
 
     :config
     (with-eval-after-load 'lsp
       (setq completion-category-defaults nil))
     (setq lsp-log-io nil
-	  lsp-restart 'auto-restart
-	  lsp-signature-render-documentation t
-	  lsp-ui-sideline-enable t
-	  lsp-modeline-code-actions-enable t
-	  lsp-modeline-diagnostics-enable t
-	  lsp-enable-on-type-formatting t
-	  lsp-idle-delay 0.5
-	  lsp-completion-provider :none
-	  lsp-completion-enable nil
-	  lsp-enable-which-key-integration t))
+          lsp-restart 'auto-restart
+          lsp-signature-render-documentation t
+          lsp-ui-sideline-enable t
+          lsp-modeline-code-actions-enable t
+          lsp-modeline-diagnostics-enable t
+          lsp-enable-on-type-formatting t
+          lsp-idle-delay 0.5
+          lsp-completion-provider :none
+          lsp-completion-enable nil
+          lsp-enable-which-key-integration t))
 
 #+end_src
 *** LSP-UI
@@ -524,41 +535,41 @@
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
     :config (setq lsp-ui-doc-delay 0.2
-		  lsp-ui-doc-position 'top
-		  lsp-ui-doc-alignment 'frame
-		  lsp-ui-doc-header nil
-		  lsp-ui-doc-include-signature t
-		  lsp-ui-doc-use-childframe t
-		  lsp-ui-sideline-show-hover t
-		  lsp-ui-sideline-delay 0.5
-		  lsp-ui-sideline-ignore-duplicates t)
+                  lsp-ui-doc-position 'top
+                  lsp-ui-doc-alignment 'frame
+                  lsp-ui-doc-header nil
+                  lsp-ui-doc-include-signature t
+                  lsp-ui-doc-use-childframe t
+                  lsp-ui-sideline-show-hover t
+                  lsp-ui-sideline-delay 0.5
+                  lsp-ui-sideline-ignore-duplicates t)
     :bind(:map evil-normal-state-map
-	       ("g d" . lsp-ui-peek-find-definitions)
-	       ("g r" . lsp-ui-peek-find-references)))
+               ("g d" . lsp-ui-peek-find-definitions)
+               ("g r" . lsp-ui-peek-find-references)))
 
 #+end_src
 *** Treesitter
 #+begin_src emacs-lisp
 
   (setq treesit-language-source-alist
-	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
-	  (c "https://github.com/tree-sitter/tree-sitter-c")
-	  (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-	  (cmake "https://github.com/uyha/tree-sitter-cmake")
-	  (css "https://github.com/tree-sitter/tree-sitter-css")
-	  (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-	  (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-	  (go "https://github.com/tree-sitter/tree-sitter-go")
-	  (html "https://github.com/tree-sitter/tree-sitter-html")
-	  (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-	  (json "https://github.com/tree-sitter/tree-sitter-json")
-	  (make "https://github.com/alemuller/tree-sitter-make")
-	  (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-	  (python "https://github.com/tree-sitter/tree-sitter-python")
-	  (toml "https://github.com/tree-sitter/tree-sitter-toml")
-	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-	  (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-	  (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+        '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+          (c "https://github.com/tree-sitter/tree-sitter-c")
+          (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+          (cmake "https://github.com/uyha/tree-sitter-cmake")
+          (css "https://github.com/tree-sitter/tree-sitter-css")
+          (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+          (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+          (go "https://github.com/tree-sitter/tree-sitter-go")
+          (html "https://github.com/tree-sitter/tree-sitter-html")
+          (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+          (json "https://github.com/tree-sitter/tree-sitter-json")
+          (make "https://github.com/alemuller/tree-sitter-make")
+          (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+          (python "https://github.com/tree-sitter/tree-sitter-python")
+          (toml "https://github.com/tree-sitter/tree-sitter-toml")
+          (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+          (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+          (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
 #+end_src
 **** Install Treesitter Grammars
@@ -572,10 +583,10 @@
 #+begin_src emacs-lisp :lexical no
 
   (setq major-mode-remap-alist
-	'((bash-mode . bash-ts-mode)
-	  (shell-script-mode . bash-ts-mode)
-	  (c-mode . c-ts-mode)
-	  (python-mode . python-ts-mode)))
+        '((bash-mode . bash-ts-mode)
+          (shell-script-mode . bash-ts-mode)
+          (c-mode . c-ts-mode)
+          (python-mode . python-ts-mode)))
 
 #+end_src
 *** Treemacs
@@ -638,8 +649,8 @@
   (use-package lsp-pyright
     :ensure t
     :hook (python-ts-mode . (lambda ()
-			      (require 'lsp-pyright)
-			      (lsp-deferred))))  ; or lsp-deferred
+                              (require 'lsp-pyright)
+                              (lsp-deferred))))  ; or lsp-deferred
 
 #+end_src
 **** EIN
@@ -650,13 +661,43 @@
 
 #+end_src
 *** Julia
+**** Julia-Mode
+#+begin_src emacs-lisp :lexical no
+
+  (use-package julia-mode
+    :hook
+    ((julia-mode . lsp-deferred)))
+
+#+end_src
+**** Julia-LSP
+#+begin_src emacs-lisp :lexical no
+
+  (use-package lsp-julia
+    :config
+    (setq lsp-julia-default-environment "~/.julia/environments/v1.9"))
+
+#+end_src
+**** Julia Snail/Repl
+#+begin_src emacs-lisp :lexical no
+
+  (use-package julia-snail
+    :after vterm
+    :bind
+    (:map vterm-mode-map
+          ("C-c C-o" . julia-snail-repl-go-back))
+    (:map julia-snail-mode-map
+          ("C-c C-o" . julia-snail))
+    :hook
+    (julia-mode . julia-snail-mode))
+
+#+end_src
 *** C
 #+begin_src emacs-lisp
 
   (use-package cc-mode
     :elpaca nil
     :hook ((c-ts-mode . lsp-deferred)
-	   (c-mode . lsp-deferred)))
+           (c-mode . lsp-deferred)))
 #+end_src
 *** Bash
 #+begin_src emacs-lisp
@@ -664,9 +705,9 @@
   (use-package sh-mode
     :elpaca nil
     :mode (("\\.sh\\'" . bash-ts-mode)
-	   ("\\.bash\\'" . bash-ts-mode))
+           ("\\.bash\\'" . bash-ts-mode))
     :hook ((bash-ts-mode . lsp-deferred)
-	   (shell-script-mode . lsp-deferred)))
+           (shell-script-mode . lsp-deferred)))
 
 #+end_src
 *** Emacs-Lisp
@@ -674,7 +715,7 @@
 
   (defun m2/emacs-lisp-mode-setup ()
     (setq-local completion-at-point-functions
-                (list (cape-super-capf
+                (list (cape-capf-super
                        #'yasnippet-capf
                        #'cape-keyword
                        #'elisp-completion-at-point
@@ -721,8 +762,17 @@
 #+begin_src emacs-lisp :lexical no
 
   (use-package pdf-tools
-    :defer t)
+    :defer t
+    :config
+    (pdf-tools-install))
 
+#+end_src
+*** Markdown
+**** Markdown Mode
+#+begin_src emacs-lisp :lexical no
+
+  (use-package markdown-mode)
+  
 #+end_src
 ** Magit
 #+begin_src emacs-lisp :lexical no
@@ -1013,7 +1063,7 @@
     (variable-pitch-mode 1)
     (visual-line-mode 1)
     (setq-local completion-at-point-functions
-                (list (cape-super-capf
+                (list (cape-capf-super
                        (cape-company-to-capf #'company-org-block)
                        #'cape-elisp-block
                        #'yasnippet-capf
@@ -1097,7 +1147,7 @@
 
     (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-    (add-to-list 'org-structure-template-alist '("py" . "src python :output results")))
+    (add-to-list 'org-structure-template-alist '("py" . "src python :results output")))
 
 #+end_src
 *** Inhibit-Pairs
@@ -1120,6 +1170,14 @@
 
     (push '("conf-unix" . conf-unix) org-src-lang-modes))
 
+#+end_src
+** LSP in Babel Source Blocks
+#+begin_src emacs-lisp :lexical no
+
+  (defun org-babel-edit-prep:python (babel-info)
+    ;; (setq-local buffer-direcotry-name (->>babel-info caddr (alist-get :dir)))
+    (setq-local buffer-file-name (->>babel-info caddr (alist-get :tangle)))
+    (lsp-deferred))
 #+end_src
 
 * Hydra
