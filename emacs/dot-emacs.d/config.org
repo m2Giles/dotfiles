@@ -10,7 +10,7 @@
   (setq lsp-use-plists t)
   (setenv "LSP_USE_PLISTS" "1")
 
-#+end_src
+  #+end_src
 * Startup Perfomance
 #+begin_src emacs-lisp
 
@@ -447,6 +447,7 @@
 
   (use-package dired
     :elpaca nil
+    :after evil-collection
     :commands (dired dired-jump)
     :bind (("C-x C-j" . dired-jump))
     :custom ((dired-listing-switches "-agho --group-directories-first"))
@@ -573,9 +574,10 @@
 
 #+end_src
 **** Install Treesitter Grammars
-#+begin_src elisp :lexical no
+#+begin_src emacs-lisp
 
-  (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+  (unless (file-exists-p (concat user-emacs-directory "tree-sitter/libtree-sitter-c.so"))
+    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
 
 #+end_src
 
@@ -752,7 +754,9 @@
 #+begin_src emacs-lisp
 
   (use-package auctex
-    :defer t)
+    :defer t
+    :hook
+    (LaTeX-mode . lsp-deferred))
   ;; :hook (LaTeX-mode . (lambda ()
   ;;                       (push (list 'output-pdf "Zathura")
   ;;                             TeX-view-program-selection))))
@@ -762,9 +766,7 @@
 #+begin_src emacs-lisp :lexical no
 
   (use-package pdf-tools
-    :defer t
-    :config
-    (pdf-tools-install))
+    :defer t)
 
 #+end_src
 *** Markdown
@@ -772,7 +774,7 @@
 #+begin_src emacs-lisp :lexical no
 
   (use-package markdown-mode)
-  
+
 #+end_src
 ** Magit
 #+begin_src emacs-lisp :lexical no
@@ -828,7 +830,7 @@
     :diminish
     :after vertico
     :bind (:map minibuffer-local-map
-		("M-A" . marginalia-cycle))
+                ("M-A" . marginalia-cycle))
     :init (marginalia-mode))
 #+end_src
 ** Consult
@@ -838,64 +840,64 @@
     :after vertico
     ;; Replace bindings. Lazily loaded due by `use-package'.
     :bind (;; C-c bindings in `mode-specific-map'
-	   ("C-c M-x" . consult-mode-command)
-	   ("C-c h" . consult-history)
-	   ("C-c k" . consult-kmacro)
-	   ("C-c m" . consult-man)
-	   ("C-c i" . consult-info)
-	   ([remap Info-search] . consult-info)
-	   ;; C-x bindings in `ctl-x-map'
-	   ("C-x M-:" . consult-complex-command)
-	   ("C-x b" . consult-buffer)
-	   ("C-x 4 b" . consult-buffer-other-window)
-	   ("C-x 5 b" . consult-buffer-other-frame)
-	   ("C-x r b" . consult-bookmark)
-	   ("C-x p b" . consult-project-buffer)
-	   ;; Custom M-# bindings for fast register access
-	   ("M-#" . consult-register-load)
-	   ("M-'" . consult-register-store)
-	   ("C-M-#" . consult-register)
-	   ;; Other custom bindings
-	   ("M-y" . consult-yank-pop)
-	   ;; M-g bindings in `goto-map'
-	   ("M-g e" . consult-compile-error)
-	   ("M-g f" . consult-flymake)
-	   ("M-g g" . consult-goto-line)
-	   ("M-g M-g" . consult-goto-line)
-	   ("M-g o" . consult-outline)
-	   ("M-g m" . consult-mark)
-	   ("M-g k" . consult-global-mark)
-	   ("M-g i" . consult-imenu)
-	   ("M-g I" . consult-imenu-multi)
-	   ;; M-s bindings in `search-map'
-	   ("M-s d" . consult-find)
-	   ("M-s D" . consult-locate)
-	   ("M-s g" . consult-grep)
-	   ("M-s G" . consult-git-grep)
-	   ("M-s r" . consult-ripgrep)
-	   ("M-s l" . consult-line)
-	   ("M-s L" . consult-line-multi)
-	   ("M-s k" . consult-keep-lines)
-	   ("M-s u" . consult-focus-lines)
-	   ;; Isearch integration
-	   ("M-s e" . consult-isearch-history)
-	   :map isearch-mode-map
-	   ("M-e" . consult-isearch-history)
-	   ("M-s e" . consult-isearch-history)
-	   ("M-s l" . consult-line)
-	   ("M-s L" . consult-line-multi)
-	   ;; Minibuffer history
-	   :map minibuffer-local-map
-	   ("M-s" . consult-history)
-	   ("M-r" . consult-history))
+           ("C-c M-x" . consult-mode-command)
+           ("C-c h" . consult-history)
+           ("C-c k" . consult-kmacro)
+           ("C-c m" . consult-man)
+           ("C-c i" . consult-info)
+           ([remap Info-search] . consult-info)
+           ;; C-x bindings in `ctl-x-map'
+           ("C-x M-:" . consult-complex-command)
+           ("C-x b" . consult-buffer)
+           ("C-x 4 b" . consult-buffer-other-window)
+           ("C-x 5 b" . consult-buffer-other-frame)
+           ("C-x r b" . consult-bookmark)
+           ("C-x p b" . consult-project-buffer)
+           ;; Custom M-# bindings for fast register access
+           ("M-#" . consult-register-load)
+           ("M-'" . consult-register-store)
+           ("C-M-#" . consult-register)
+           ;; Other custom bindings
+           ("M-y" . consult-yank-pop)
+           ;; M-g bindings in `goto-map'
+           ("M-g e" . consult-compile-error)
+           ("M-g f" . consult-flymake)
+           ("M-g g" . consult-goto-line)
+           ("M-g M-g" . consult-goto-line)
+           ("M-g o" . consult-outline)
+           ("M-g m" . consult-mark)
+           ("M-g k" . consult-global-mark)
+           ("M-g i" . consult-imenu)
+           ("M-g I" . consult-imenu-multi)
+           ;; M-s bindings in `search-map'
+           ("M-s d" . consult-find)
+           ("M-s D" . consult-locate)
+           ("M-s g" . consult-grep)
+           ("M-s G" . consult-git-grep)
+           ("M-s r" . consult-ripgrep)
+           ("M-s l" . consult-line)
+           ("M-s L" . consult-line-multi)
+           ("M-s k" . consult-keep-lines)
+           ("M-s u" . consult-focus-lines)
+           ;; Isearch integration
+           ("M-s e" . consult-isearch-history)
+           :map isearch-mode-map
+           ("M-e" . consult-isearch-history)
+           ("M-s e" . consult-isearch-history)
+           ("M-s l" . consult-line)
+           ("M-s L" . consult-line-multi)
+           ;; Minibuffer history
+           :map minibuffer-local-map
+           ("M-s" . consult-history)
+           ("M-r" . consult-history))
 
     :hook (completion-list-mode . consult-preview-at-point-mode)
     :init
     (setq register-preview-delay 0.5
-	  register-preview-function #'consult-register-format)
+          register-preview-function #'consult-register-format)
     (advice-add #'register-preview :override #'consult-register-window)
     (setq xref-show-xrefs-function #'consult-xref
-	  xref-show-definitions-function #'consult-xref)
+          xref-show-definitions-function #'consult-xref)
     :config
     ;; (setq consult-preview-key 'any)
     (setq consult-preview-key "M-.")
@@ -925,9 +927,9 @@
     (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
     :config
     (add-to-list 'display-buffer-alist
-		 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-		   nil
-		   (window-parameters (mode-line-format . none)))))
+                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                   nil
+                   (window-parameters (mode-line-format . none)))))
 
   (use-package embark-consult
     :hook (embark-collect-mode . consult-preview-at-point-mode))
@@ -942,14 +944,13 @@
     :diminish
     :elpaca nil
     :init (savehist-mode))
-  (setq enable-recursive-minibuffers t)
 
   (use-package orderless
     :diminish
     :init
     (setq completion-styles '(orderless partial-completion basic)
-	  completion-category-defaults nil
-	  completion-category-overrides nil))
+          completion-category-defaults nil
+          completion-category-overrides nil))
 
 #+end_src
 
@@ -957,43 +958,45 @@
 
 #+begin_src emacs-lisp
 
-      (use-package corfu
-        :demand t
-        :init
-        (setq corfu-popupinfo-delay 0.2)
-        (corfu-popupinfo-mode)
-        :bind (:map corfu-map
-                    ("C-n" . corfu-next)
-                    ("C-p" . corfu-previous)
-                    ("C-j" . corfu-popupinfo-scroll-down)
-                    ("C-k" . corfu-popupinfo-scroll-up)
-                    ("M-d" . corfu-info-documentation)
-                    ("<escape>" . evil-collection-corfu-quit-and-escape))
-        :config
-        (global-corfu-mode)
-        (setq corfu-auto-delay 0.1
-              corfu-auto-prefix 1
-              corfu-echo-documentation t
-              corfu-cycle t
-              corfu-auto t
-              corfu-scroll-margin 0
-              corfu-count 8
-              corfu-max-width 50
-              corfu-preselect 'directory
-              corfu-min-width corfu-max-width
-              tab-always-indent 'complete))
+  (use-package corfu
+    :demand t
+    :init
+    (global-corfu-mode)
+    (setq corfu-popupinfo-delay 0.2)
+    (corfu-popupinfo-mode)
+    :bind (:map corfu-map
+                ("C-n" . corfu-next)
+                ("C-p" . corfu-previous)
+                ("<" . corfu-insert-separator)
+                ("C-j" . corfu-popupinfo-scroll-down)
+                ("C-k" . corfu-popupinfo-scroll-up)
+                ("M-d" . corfu-info-documentation)
+                ("<escape>" . evil-collection-corfu-quit-and-escape))
+    :config
+    (setq corfu-auto-delay 0.1
+          corfu-auto-prefix 1
+          corfu-echo-documentation t
+          corfu-cycle t
+          corfu-auto t
+          corfu-scroll-margin 0
+          corfu-count 8
+          corfu-max-width 50
+          corfu-on-exact-match #'nil
+          corfu-popupinfo-hide #'nil
+          corfu-min-width corfu-max-width
+          tab-always-indent 'complete))
 
-    (defun corfu-send-shell (&rest _)
-      "Send completion candidate when inside comint/eshell."
-      (cond
-       ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
-        (eshell-send-input))
-       ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
-        (comint-send-input))))
+  (defun corfu-send-shell (&rest _)
+    "Send completion candidate when inside comint/eshell."
+    (cond
+     ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
+      (eshell-send-input))
+     ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
+      (comint-send-input))))
 
-    (advice-add #'corfu-insert :after #'corfu-send-shell)
+  (advice-add #'corfu-insert :after #'corfu-send-shell)
 
-    #+end_src
+#+end_src
 ** CAPE
 #+begin_src emacs-lisp
 
@@ -1119,6 +1122,7 @@
           org-agenda-start-with-log-mode t
           org-log-done 'time
           org-log-into-drawer t
+          org-startup-folded t
           org-ellipsis " ▾"))
 
   (use-package org-bullets
@@ -1147,7 +1151,9 @@
 
     (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-    (add-to-list 'org-structure-template-alist '("py" . "src python :results output")))
+    (add-to-list 'org-structure-template-alist '("py" . "src python :results output raw")))
+
+#+end_src
 
 #+end_src
 *** Inhibit-Pairs
@@ -1175,9 +1181,10 @@
 #+begin_src emacs-lisp :lexical no
 
   (defun org-babel-edit-prep:python (babel-info)
-    ;; (setq-local buffer-direcotry-name (->>babel-info caddr (alist-get :dir)))
-    (setq-local buffer-file-name (->>babel-info caddr (alist-get :tangle)))
-    (lsp-deferred))
+    ;; (setq-local default-directory (->> babel-info caddr (alist-get :dir)))
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (lsp))
+
 #+end_src
 
 * Hydra
@@ -1276,19 +1283,6 @@
   (advice-add 'super-save-command :after 'm2/clear-echo-area-timer)
 
 #+end_src
-* Auto-Tangle Configuration File
-#+begin_src emacs-lisp
-
-  (defun m2/org-babel-tangle-config ()
-    (when (string-equal (file-name-directory (buffer-file-name))
-                        (expand-file-name user-emacs-directory))
-      ;; Dynamic scoping to the rescue
-      (let ((org-confirm-babel-evaluate nil))
-        (org-babel-tangle))))
-
-  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'m2/org-babel-tangle-config)))
-
-#+end_src
 * Runtime Perfomance
 #+begin_src emacs-lisp
 
@@ -1297,3 +1291,8 @@
   (setq read-process-output-max (* 1024 1024))
 
 #+end_src
+* Local Variables Auto-Tangle Configuration File
+;; Local Variables:
+;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Reload?")(load-file user-init-file))) nil t)
+;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Tangle?")(org-babel-tangle))) nil t)
+;; End:
