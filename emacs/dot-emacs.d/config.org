@@ -6,7 +6,7 @@
 
   (defvar m2/default-font-size 140)
   (defvar m2/default-variable-font-size 160)
-  (defvar m2/frame-transparency '(95 . 95))
+  (defvar m2/frame-transparency '(100 . 100))
   (setq lsp-use-plists t)
   (setenv "LSP_USE_PLISTS" "1")
 
@@ -175,6 +175,7 @@
   (tooltip-mode -1)
   (set-fringe-mode 10)
   (menu-bar-mode -1)
+  (scroll-bar-mode -1)
 
   (setq visible-bell t)
 
@@ -754,18 +755,14 @@
 #+begin_src emacs-lisp
 
   (use-package auctex
-    :elpaca (auctex :pre-build (("./autogen.sh")
-                                ("./configure" "--without-texmf-dir" "--with-lispdir=.")
-                                ("make")))
+    :elpaca (auctex :pre-build (("./autogen.sh") ("./configure" "--without-texmf-dir" "--with-lispdir=.") ("make")))
     :mode
     ("\\.tex\\'" . TeX-latex-mode)
     :hook
     ((LaTeX-mode . lsp-deferred)
      (LaTeX-mode . (lambda ()
                      (push (list 'output-pdf "Zathura")
-                           TeX-view-program-selection))))
-    :config
-    (setq LaTeX-amsmath-label #'t))
+                           TeX-view-program-selection)))))
 
 #+end_src
 **** PDF-Tools
@@ -964,44 +961,44 @@
 
 #+begin_src emacs-lisp
 
-    (use-package corfu
-      :demand t
-      :init
-      (global-corfu-mode)
-      (setq corfu-popupinfo-delay 0.2)
-      (corfu-popupinfo-mode)
-      :bind (:map corfu-map
-                  ("C-n" . corfu-next)
-                  ("C-p" . corfu-previous)
-                  ("<" . corfu-insert-separator)
-                  ("C-j" . corfu-popupinfo-scroll-down)
-                  ("C-k" . corfu-popupinfo-scroll-up)
-                  ("M-d" . corfu-info-documentation)
-                  ("<escape>" . evil-collection-corfu-quit-and-escape))
-      :config
-      (setq corfu-auto-delay 0.1
-            corfu-auto-prefix 1
-            corfu-echo-documentation t
-            corfu-cycle t
-            corfu-auto t
-            corfu-scroll-margin 0
-            corfu-count 8
-            corfu-max-width 50
-            corfu-on-exact-match #'nil
-            corfu-popupinfo-hide #'nil
-            corfu-min-width corfu-max-width
-            tab-always-indent 'complete)
-      (corfu-history-mode))
+  (use-package corfu
+    :demand t
+    :init
+    (global-corfu-mode)
+    (setq corfu-popupinfo-delay 0.2)
+    (corfu-popupinfo-mode)
+    :bind (:map corfu-map
+                ("C-n" . corfu-next)
+                ("C-p" . corfu-previous)
+                ("<" . corfu-insert-separator)
+                ("C-j" . corfu-popupinfo-scroll-down)
+                ("C-k" . corfu-popupinfo-scroll-up)
+                ("M-d" . corfu-info-documentation)
+                ("<escape>" . evil-collection-corfu-quit-and-escape))
+    :config
+    (setq corfu-auto-delay 0.1
+          corfu-auto-prefix 1
+          corfu-echo-documentation t
+          corfu-cycle t
+          corfu-auto t
+          corfu-scroll-margin 0
+          corfu-count 8
+          corfu-max-width 50
+          corfu-on-exact-match #'nil
+          corfu-popupinfo-hide #'nil
+          corfu-min-width corfu-max-width
+          tab-always-indent 'complete)
+    (corfu-history-mode))
 
-    (defun corfu-send-shell (&rest _)
-      "Send completion candidate when inside comint/eshell."
-      (cond
-       ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
-        (eshell-send-input))
-       ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
-        (comint-send-input))))
+  (defun corfu-send-shell (&rest _)
+    "Send completion candidate when inside comint/eshell."
+    (cond
+     ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
+      (eshell-send-input))
+     ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
+      (comint-send-input))))
 
-    (advice-add #'corfu-insert :after #'corfu-send-shell)
+  (advice-add #'corfu-insert :after #'corfu-send-shell)
 
 #+end_src
 ** CAPE/CAPF
@@ -1161,8 +1158,6 @@
     (add-to-list 'org-structure-template-alist '("py" . "src python :results output raw")))
 
 #+end_src
-
-#+end_src
 *** Inhibit-Pairs
 #+begin_src emacs-lisp
 
@@ -1194,6 +1189,54 @@
 
 #+end_src
 
+** Org-Present
+#+begin_src emacs-lisp
+
+  (defun m2/org-present-prepare-slide ()
+    (org-overview)
+    (org-show-entry)
+    (org-show-children))
+
+  (defun m2/org-present-hook ()
+    (setq-local face-remapping-alist '((default (:height 1.5) variable-pitch)
+                                       (header-line (:height 4.5) variable-pitch)
+                                       (org-document-title (:height 1.75) org-document-title)
+                                       (org-code (:height 1.55) org-code)
+                                       (org-verbatim (:height 1.55) org-verbatim)
+                                       (org-block (:height 1.25) org-block)
+                                       (org-block-begin-line (:height 0.7) org-block)))
+    (setq header-line-format " ")
+    (org-appear-mode -1)
+    (org-display-inline-images)
+    (m2/org-present-prepare-slide))
+
+  (defun m2/org-present-quit-hook ()
+    (setq-local face-remapping-alist '((default variable-pitch default)))
+    (setq header-line-format nil)
+    (org-present-small)
+    (org-remove-inline-images)
+    (org-appear-mode 1))
+
+  (defun m2/org-present-prev ()
+    (interactive)
+    (org-present-prev)
+    (m2/org-present-prepare-slide))
+
+  (defun m2/org-present-next ()
+    (interactive)
+    (org-present-next)
+    (m2/org-present-prepare-slide))
+
+  (use-package org-present
+    :after org
+    :bind (:map org-present-mode-keymap
+                ("C-c C-j" . m2/org-present-next)
+                ("C-c C-k" . m2/org-present-prev))
+    :hook
+    ((org-present . m2/org-present-hook)
+     (org-present-quit . m2/org-present-quit-hook)))
+
+#+end_src
 * Hydra
 #+begin_src emacs-lisp
 
@@ -1253,23 +1296,34 @@
       ("<up>" windresize-up)
 
       ("q" nil)))
+
 #+end_src
 * TRAMP
 ** Distrobox Support
 #+begin_src emacs-lisp :lexical no
 
   (use-package tramp
-               :elpaca nil
-               :config
-               (push
-                (cons
-                 "distrobox"
-                 '((tramp-login-program "distrobox")
-                   (tramp-login-args (("enter") ("%h")))
-                   (tramp-remote-shell "/bin/sh")
-                   (tramp-remote-shell-args ("-i") ("-c"))))
-                tramp-methods))
+    :elpaca nil
+    :config
+    (push
+     (cons
+      "distrobox"
+      '((tramp-login-program "distrobox-host-exec distrobox")
+        (tramp-login-args (("enter") ("%h")))
+        (tramp-remote-shell "/bin/sh")
+        (tramp-remote-shell-login ("-l"))
+        (tramp-remote-shell-args ("-i" "-c"))))
+     tramp-methods))
 
+#+end_src
+** Toolbox Support
+#+begin_src emacs-lisp :lexical no
+
+  (use-package toolbox-tramp
+    :elpaca (toolbox-tramp :type git
+                           :host github
+                           :repo "fejfighter/toolbox-tramp"))
+  
 #+end_src
 * Super Save
 #+begin_src emacs-lisp
