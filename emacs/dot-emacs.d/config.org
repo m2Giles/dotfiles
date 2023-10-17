@@ -10,7 +10,7 @@
   (setq lsp-use-plists t)
   (setenv "LSP_USE_PLISTS" "1")
 
-  #+end_src
+#+end_src
 * Startup Perfomance
 #+begin_src emacs-lisp
 
@@ -606,10 +606,10 @@
 *** DAP Mode
 #+begin_src emacs-lisp
 
-(use-package dap-mode
-:commands dap-debug)
+  (use-package dap-mode
+    :commands dap-debug)
 
-#+end_src1
+#+end_src
 *** Electric Modes
 #+begin_src emacs-lisp
 
@@ -754,12 +754,18 @@
 #+begin_src emacs-lisp
 
   (use-package auctex
-    :defer t
+    :elpaca (auctex :pre-build (("./autogen.sh")
+                                ("./configure" "--without-texmf-dir" "--with-lispdir=.")
+                                ("make")))
+    :mode
+    ("\\.tex\\'" . TeX-latex-mode)
     :hook
-    (LaTeX-mode . lsp-deferred))
-  ;; :hook (LaTeX-mode . (lambda ()
-  ;;                       (push (list 'output-pdf "Zathura")
-  ;;                             TeX-view-program-selection))))
+    ((LaTeX-mode . lsp-deferred)
+     (LaTeX-mode . (lambda ()
+                     (push (list 'output-pdf "Zathura")
+                           TeX-view-program-selection))))
+    :config
+    (setq LaTeX-amsmath-label #'t))
 
 #+end_src
 **** PDF-Tools
@@ -958,46 +964,47 @@
 
 #+begin_src emacs-lisp
 
-  (use-package corfu
-    :demand t
-    :init
-    (global-corfu-mode)
-    (setq corfu-popupinfo-delay 0.2)
-    (corfu-popupinfo-mode)
-    :bind (:map corfu-map
-                ("C-n" . corfu-next)
-                ("C-p" . corfu-previous)
-                ("<" . corfu-insert-separator)
-                ("C-j" . corfu-popupinfo-scroll-down)
-                ("C-k" . corfu-popupinfo-scroll-up)
-                ("M-d" . corfu-info-documentation)
-                ("<escape>" . evil-collection-corfu-quit-and-escape))
-    :config
-    (setq corfu-auto-delay 0.1
-          corfu-auto-prefix 1
-          corfu-echo-documentation t
-          corfu-cycle t
-          corfu-auto t
-          corfu-scroll-margin 0
-          corfu-count 8
-          corfu-max-width 50
-          corfu-on-exact-match #'nil
-          corfu-popupinfo-hide #'nil
-          corfu-min-width corfu-max-width
-          tab-always-indent 'complete))
+    (use-package corfu
+      :demand t
+      :init
+      (global-corfu-mode)
+      (setq corfu-popupinfo-delay 0.2)
+      (corfu-popupinfo-mode)
+      :bind (:map corfu-map
+                  ("C-n" . corfu-next)
+                  ("C-p" . corfu-previous)
+                  ("<" . corfu-insert-separator)
+                  ("C-j" . corfu-popupinfo-scroll-down)
+                  ("C-k" . corfu-popupinfo-scroll-up)
+                  ("M-d" . corfu-info-documentation)
+                  ("<escape>" . evil-collection-corfu-quit-and-escape))
+      :config
+      (setq corfu-auto-delay 0.1
+            corfu-auto-prefix 1
+            corfu-echo-documentation t
+            corfu-cycle t
+            corfu-auto t
+            corfu-scroll-margin 0
+            corfu-count 8
+            corfu-max-width 50
+            corfu-on-exact-match #'nil
+            corfu-popupinfo-hide #'nil
+            corfu-min-width corfu-max-width
+            tab-always-indent 'complete)
+      (corfu-history-mode))
 
-  (defun corfu-send-shell (&rest _)
-    "Send completion candidate when inside comint/eshell."
-    (cond
-     ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
-      (eshell-send-input))
-     ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
-      (comint-send-input))))
+    (defun corfu-send-shell (&rest _)
+      "Send completion candidate when inside comint/eshell."
+      (cond
+       ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
+        (eshell-send-input))
+       ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
+        (comint-send-input))))
 
-  (advice-add #'corfu-insert :after #'corfu-send-shell)
+    (advice-add #'corfu-insert :after #'corfu-send-shell)
 
 #+end_src
-** CAPE
+** CAPE/CAPF
 #+begin_src emacs-lisp
 
   (use-package cape
