@@ -25,7 +25,6 @@ GTK_THEME-container() {
 }
 
 #debuginfod
-
 DEBUGINFO-container() {
 	if [ ! -e /run/.containerenv ] && [ ! -e /.dockerenv ]; then
 		exit 127
@@ -36,6 +35,3 @@ DEBUGINFO-container() {
 		export DEBUGINFOD_URLS=https://debuginfod.archlinux.org
 	fi
 }
-
-GTK_THEME-container
-DEBUGINFO-container
