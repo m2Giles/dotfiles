@@ -1,0 +1,8 @@
+{
+	"remoteUser": "${localEnv:USER}",
+	"extensions": [
+		"draivin.hscopes",
+		"efoerster.texlab",
+		"valentjn.vscode-ltex"
+	]
+}
