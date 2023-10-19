@@ -18,20 +18,20 @@ fi
 
 #Set Theme
 GTK_THEME-container() {
-	if [ ! -e /run/.containerenv ] && [ ! -e /.dockerenv ]; then
-		exit 127
+	if [ -e /run/.containerenv ] || [ -e /.dockerenv ]; then
+		export GTK_THEME=Adwaita-dark
 	fi
-	export GTK_THEME=Adwaita-dark
 }
 
 #debuginfod
 DEBUGINFO-container() {
-	if [ ! -e /run/.containerenv ] && [ ! -e /.dockerenv ]; then
-		exit 127
-	fi
-	source /etc/os-release
-
-	if [ ! "$(printenv | grep -q DEBUGINFOD_URLS=https://debuginfod.archlinux.org)" ] && [ "$(printenv | grep -q archlinux)" ]; then
-		export DEBUGINFOD_URLS=https://debuginfod.archlinux.org
+	if [ -e /run/.containerenv ] || [ -e /.dockerenv ]; then
+		source /etc/os-release
+		if [ ! "$(printenv | grep -q DEBUGINFOD_URLS=https://debuginfod.archlinux.org)" ] && [ "$(printenv | grep -q archlinux)" ]; then
+			export DEBUGINFOD_URLS=https://debuginfod.archlinux.org
+		fi
 	fi
 }
+
+GTK_THEME-container
+DEBUGINFO-container

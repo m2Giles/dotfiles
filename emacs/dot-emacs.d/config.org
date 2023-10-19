@@ -1309,7 +1309,7 @@
      (cons
       "distrobox"
       '((tramp-login-program "distrobox-host-exec distrobox")
-        (tramp-login-args (("enter") ("%h")))
+        (tramp-login-args (("enter -nw") ("%h")))
         (tramp-remote-shell "/bin/sh")
         (tramp-remote-shell-login ("-l"))
         (tramp-remote-shell-args ("-i" "-c"))))
