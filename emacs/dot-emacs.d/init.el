@@ -1066,15 +1066,25 @@ _q_uit          _e_qualize        _]_forward     ^
 (use-package tramp
   :elpaca nil
   :config
-  (push
-   (cons
-    "distrobox"
-    '((tramp-login-program "distrobox")
-      (tramp-login-args (("enter -nw") ("%h")))
-      (tramp-remote-shell "/bin/sh")
-      (tramp-remote-shell-login ("-l"))
-      (tramp-remote-shell-args ("-i" "-c"))))
-   tramp-methods))
+  (if (file-exists-p "/run/.containerenv")
+      ((push
+        (cons
+         "distrobox"
+         '((tramp-login-program "distrobox-host-exec distrobox")
+           (tramp-login-args (("enter -nw") ("%h")))
+           (tramp-remote-shell "/bin/sh")
+           (tramp-remote-shell-login ("-l"))
+           (tramp-remote-shell-args ("-i" "-c"))))
+        tramp-methods))
+    (push
+     (cons
+      "distrobox"
+      '((tramp-login-program "distrobox")
+        (tramp-login-args (("enter -nw") ("%h")))
+        (tramp-remote-shell "/bin/sh")
+        (tramp-remote-shell-login ("-l"))
+        (tramp-remote-shell-args ("-i" "-c"))))
+     tramp-methods)))
 
 (use-package toolbox-tramp
   :elpaca (toolbox-tramp :type git
