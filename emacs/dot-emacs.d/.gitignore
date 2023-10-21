@@ -1,5 +1,6 @@
 *
 !config*.org
 !early-init.el
+!init.el
 !.gitignore
 !*.bak
