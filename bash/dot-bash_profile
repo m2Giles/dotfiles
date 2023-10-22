@@ -1,6 +1,11 @@
 # vim:ft=sh
 # .bash_profile
 
+# Cargo
+if [ -f ~/.cargo/env ]; then
+	. ~/.cargo/env
+fi
+
 # Get the aliases and functions
 if [ -f ~/.bashrc ]; then
 	. ~/.bashrc

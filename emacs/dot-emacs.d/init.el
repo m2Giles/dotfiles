@@ -284,14 +284,17 @@
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
   (evil-define-key '(normal motion) 'global
-                       (kbd "H") 'evil-prev-buffer
-                       (kbd "L") 'evil-next-buffer
-                       (kbd "C-S-H") 'evil-window-left
-                       (kbd "C-S-J") 'evil-window-down
-                       (kbd "C-S-K") 'evil-window-up
-                       (kbd "C-S-L") 'evil-window-right)
+    (kbd "H") 'evil-prev-buffer
+    (kbd "L") 'evil-next-buffer
+    (kbd "C-S-H") 'evil-window-left
+    (kbd "C-S-J") 'evil-window-down
+    (kbd "C-S-K") 'evil-window-up
+    (kbd "C-S-L") 'evil-window-right)
 
   (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'eshell-mode 'emacs)
+  (evil-set-initial-state 'eat-mode 'emacs)
+  (evil-set-initial-state 'vterm-mode 'emacs)
   (evil-set-initial-state 'dashboard-mode 'normal))
 
 (use-package evil-collection
@@ -1066,16 +1069,16 @@ _q_uit          _e_qualize        _]_forward     ^
 (use-package tramp
   :elpaca nil
   :config
-  (if (file-exists-p "/run/.containerenv")
-      ((push
-        (cons
-         "distrobox"
-         '((tramp-login-program "distrobox-host-exec distrobox")
-           (tramp-login-args (("enter -nw") ("%h")))
-           (tramp-remote-shell "/bin/sh")
-           (tramp-remote-shell-login ("-l"))
-           (tramp-remote-shell-args ("-i" "-c"))))
-        tramp-methods))
+  (if (file-exists-p "/run/.containerenv") 
+    (push
+     (cons
+      "distrobox"
+      '((tramp-login-program "distrobox-host-exec distrobox")
+        (tramp-login-args (("enter -nw") ("%h")))
+        (tramp-remote-shell "/bin/sh")
+        (tramp-remote-shell-login ("-l"))
+        (tramp-remote-shell-args ("-i" "-c"))))
+     tramp-methods)
     (push
      (cons
       "distrobox"

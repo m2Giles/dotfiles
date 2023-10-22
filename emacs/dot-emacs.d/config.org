@@ -305,53 +305,56 @@
 * Evil
 #+begin_src emacs-lisp
 
-    (use-package evil
-      :init
-      (setq evil-want-integration t)
-      (setq evil-want-keybinding nil)
-      (setq evil-want-C-u-scroll t)
-      (setq evil-want-C-i-jump nil)
-      (setq evil-want-Y-yank-to-eol t)
-      (setq evil-split-window-below t)
-      (setq evil-vsplit-window-right t)
-      (setq evil-insert-state-message nil)
-      (setq evil-replace-state-message nil)
-      (setq evil-visual-state-message nil)
-      (setq evil-undo-system 'undo-tree)
-      :config
-      (evil-mode 1)
-      (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-      (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-      (global-set-key (kbd "C-M-u") 'universal-argument)
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    (setq evil-want-Y-yank-to-eol t)
+    (setq evil-split-window-below t)
+    (setq evil-vsplit-window-right t)
+    (setq evil-insert-state-message nil)
+    (setq evil-replace-state-message nil)
+    (setq evil-visual-state-message nil)
+    (setq evil-undo-system 'undo-tree)
+    :config
+    (evil-mode 1)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+    (global-set-key (kbd "C-M-u") 'universal-argument)
 
-      ;; Use visual line motions even outside of visual-line-mode buffers
-      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-      (evil-define-key '(normal motion) 'global
-                           (kbd "H") 'evil-prev-buffer
-                           (kbd "L") 'evil-next-buffer
-                           (kbd "C-S-H") 'evil-window-left
-                           (kbd "C-S-J") 'evil-window-down
-                           (kbd "C-S-K") 'evil-window-up
-                           (kbd "C-S-L") 'evil-window-right)
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+    (evil-define-key '(normal motion) 'global
+      (kbd "H") 'evil-prev-buffer
+      (kbd "L") 'evil-next-buffer
+      (kbd "C-S-H") 'evil-window-left
+      (kbd "C-S-J") 'evil-window-down
+      (kbd "C-S-K") 'evil-window-up
+      (kbd "C-S-L") 'evil-window-right)
 
-      (evil-set-initial-state 'messages-buffer-mode 'normal)
-      (evil-set-initial-state 'dashboard-mode 'normal))
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'eshell-mode 'emacs)
+    (evil-set-initial-state 'eat-mode 'emacs)
+    (evil-set-initial-state 'vterm-mode 'emacs)
+    (evil-set-initial-state 'dashboard-mode 'normal))
 
-    (use-package evil-collection
-      :after evil
-      :config
-      (evil-collection-init))
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
 
-    (use-package evil-commentary
-      :after evil
-      :config
-      (evil-commentary-mode))
+  (use-package evil-commentary
+    :after evil
+    :config
+    (evil-commentary-mode))
 
-    (use-package undo-tree
-      :config
-      (global-undo-tree-mode)
-      (setq undo-tree-auto-save-history nil))
+  (use-package undo-tree
+    :config
+    (global-undo-tree-mode)
+    (setq undo-tree-auto-save-history nil))
 
 #+end_src
 
@@ -372,20 +375,20 @@
 * Themes
 #+begin_src emacs-lisp
 
-      (use-package doom-themes
-        :config
-        (setq doom-themes-enable-bold t
-              doom-themes-enable-italic t)
-        (load-theme 'doom-gruvbox t)
-        (doom-themes-visual-bell-config))
+  (use-package doom-themes
+    :config
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (load-theme 'doom-gruvbox t)
+    (doom-themes-visual-bell-config))
 
-      (use-package doom-modeline
-        :init (doom-modeline-mode 1)
-        :config
-        (setq doom-modeline-height 25
-              doom-modeline-bar-width 5
-              doom-modeline-persp-name t
-              doom-modeline-persp-icon t))
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-height 25
+          doom-modeline-bar-width 5
+          doom-modeline-persp-name t
+          doom-modeline-persp-icon t))
 
 #+end_src
 * Terminals
@@ -614,38 +617,38 @@
 *** Treemacs
 #+begin_src emacs-lisp
 
-    (use-package treemacs
-      :commands (treemacs)
-      :bind
-      (:map global-map
-            ("M-0" . treemacs-select-window)
-            ("C-x t 1" . treemacs-delete-other-windows)
-            ("C-x t t" . treemacs)
-            ("C-x t d" . treemacs-select-directory)
-            ("C-x t B" . treemacs-bookmark)
-            ("C-x t C-t" . treemacs-find-file)
-            ("C-x t M-t" . treemacs-find-tag)))
+  (use-package treemacs
+    :commands (treemacs)
+    :bind
+    (:map global-map
+          ("M-0" . treemacs-select-window)
+          ("C-x t 1" . treemacs-delete-other-windows)
+          ("C-x t t" . treemacs)
+          ("C-x t d" . treemacs-select-directory)
+          ("C-x t B" . treemacs-bookmark)
+          ("C-x t C-t" . treemacs-find-file)
+          ("C-x t M-t" . treemacs-find-tag)))
 
-    (use-package treemacs-evil
-      :after (treemacs evil))
+  (use-package treemacs-evil
+    :after (treemacs evil))
 
-    (use-package treemacs-projectile
-      :after (treemacs projectile))
+  (use-package treemacs-projectile
+    :after (treemacs projectile))
 
-    (use-package treemacs-all-the-icons
-      :after treemacs)
+  (use-package treemacs-all-the-icons
+    :after treemacs)
 
-    (use-package treemacs-tab-bar
-      :after (treemacs)
-      :config (treemacs-set-scope-type 'Tabs))
+  (use-package treemacs-tab-bar
+    :after (treemacs)
+    :config (treemacs-set-scope-type 'Tabs))
 
-    (use-package treemacs-icons-dired
-      :hook (dired-mode . treemacs-icons-dired-enable-once))
+  (use-package treemacs-icons-dired
+    :hook (dired-mode . treemacs-icons-dired-enable-once))
 
-    (use-package lsp-treemacs
-      :after treemacs
-      :config
-      (lsp-treemacs-sync-mode 1))
+  (use-package lsp-treemacs
+    :after treemacs
+    :config
+    (lsp-treemacs-sync-mode 1))
 
 #+end_src
 *** DAP Mode
@@ -805,7 +808,7 @@
     :mode
     (("\\.yml\\'" . yaml-ts-mode)
      ("\\.yaml\\'" . yaml-ts-mode)))
-  
+
 #+end_src
 *** LaTeX
 #+begin_src emacs-lisp
@@ -1361,16 +1364,16 @@
   (use-package tramp
     :elpaca nil
     :config
-    (if (file-exists-p "/run/.containerenv")
-        ((push
-          (cons
-           "distrobox"
-           '((tramp-login-program "distrobox-host-exec distrobox")
-             (tramp-login-args (("enter -nw") ("%h")))
-             (tramp-remote-shell "/bin/sh")
-             (tramp-remote-shell-login ("-l"))
-             (tramp-remote-shell-args ("-i" "-c"))))
-          tramp-methods))
+    (if (file-exists-p "/run/.containerenv") 
+      (push
+       (cons
+        "distrobox"
+        '((tramp-login-program "distrobox-host-exec distrobox")
+          (tramp-login-args (("enter -nw") ("%h")))
+          (tramp-remote-shell "/bin/sh")
+          (tramp-remote-shell-login ("-l"))
+          (tramp-remote-shell-args ("-i" "-c"))))
+       tramp-methods)
       (push
        (cons
         "distrobox"
