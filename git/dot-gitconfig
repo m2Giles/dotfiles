@@ -4,3 +4,9 @@
 
 [credential "https://code.levelup.cce.af.mil"]
     helper = libsecret
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential

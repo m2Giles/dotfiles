@@ -1,0 +1,38 @@
+generate_flatpak_bin() {
+    if [ -d /var/lib/flatpak/exports/bin/ ]; then
+	ls /var/lib/flatpak/exports/bin/ | while read appid;
+	do echo "#!/bin/sh" >> $HOME/.local/bin/$appid 
+	   echo 'if [ $(command -v flatpak) ]; then' >> $HOME/.local/bin/$appid
+	   echo -e "\tflatpak run $appid" >> $HOME/.local/bin/$appid 
+	   echo 'elif [ $(command -v distrobox-host-exec) ] && [ -e "/run/.containerenv" ]; then' >> $HOME/.local/bin/$appid
+	   echo -e "\tdistrobox-host-exec run $appid" >> $HOME/.local/bin/$appid 
+	   echo "fi" >> $HOME/.local/bin/$appid
+	   chmod +x $HOME/.local/bin/$appid;
+	done
+    fi
+    if [ -d ${XDG_DATA_HOME:-$HOME/.local/share}/flatpak/exports/bin/ ]; then
+	ls ${XDG_DATA_HOME:-$HOME/.local/share}/flatpak/exports/bin/ | while read appid;
+	do echo "#!/bin/sh" >> $HOME/.local/bin/$appid 
+	   echo 'if [ $(command -v flatpak) ]; then' >> $HOME/.local/bin/$appid
+	   echo -e "\tflatpak run $appid" >> $HOME/.local/bin/$appid 
+	   echo 'elif [ $(command -v distrobox-host-exec) ] && [ -e "/run/.containerenv" ]; then' >> $HOME/.local/bin/$appid
+	   echo -e "\tdistrobox-host-exec run $appid" >> $HOME/.local/bin/$appid 
+	   echo "fi" >> $HOME/.local/bin/$appid
+	   chmod +x $HOME/.local/bin/$appid;
+	done
+    fi
+}
+remove_flatpak_bin() {
+    if [ -d /var/lib/flatpak/exports/bin/ ]; then
+	ls /var/lib/flatpak/exports/bin/ | while read appid;
+	do 
+	    rm $HOME/.local/bin/$appid
+	done
+    fi
+    if [ -d ${XDG_DATA_HOME:-$HOME/.local/share}/flatpak/exports/bin/ ]; then
+	ls ${XDG_DATA_HOME:-$HOME/.local/share}/flatpak/exports/bin/ | while read appid;
+	do 
+	    rm $HOME/.local/bin/$appid
+	done
+    fi
+}
