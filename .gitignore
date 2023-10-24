@@ -1,9 +1,9 @@
-vscode/dot-config/Code/Backups/0285aca99649bc822e9c06bef30896fe/file
-vscode/dot-config/Code/Cache/Cache_Data
-vscode/dot-config/Code/CachedConfigurations/folder/-2f98a19f
-vscode/dot-config/Code/CachedData/f1b07bd25dfad64b0167beb15359ae573aecd2cc
+vscode/dot-config/Code/Backups
+vscode/dot-config/Code/Cache
+vscode/dot-config/Code/CachedConfigurations
+vscode/dot-config/Code/CachedData
 vscode/dot-config/Code/CachedExtensionVSIXs
-vscode/dot-config/Code/CachedProfilesData/__default__profile__
+vscode/dot-config/Code/CachedProfilesData
 vscode/dot-config/Code/Code Cache
 vscode/dot-config/Code/Crashpad
 vscode/dot-config/Code/DawnCache
@@ -33,5 +33,6 @@ vscode/dot-config/Code/TransportSecurity
 vscode/dot-config/Code/code.lock
 vscode/dot-config/Code/languagepacks.json
 vscode/dot-config/Code/machineid
+vscode/dot-config/Code/.org.chromium.Chromium.*
 nvim/dot-config/nvim/lazy-lock.json
 nvim/dot-config/nvim/lazyvim.json

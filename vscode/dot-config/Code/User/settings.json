@@ -1,0 +1,4 @@
+{
+    "dev.containers.dockerPath": "podman",
+    "editor.fontFamily": "'CaskaydiaCove Nerd Font' , 'Droid Sans Mono', 'monospace', monospace",
+}
