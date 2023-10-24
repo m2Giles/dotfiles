@@ -33,3 +33,5 @@ vscode/dot-config/Code/TransportSecurity
 vscode/dot-config/Code/code.lock
 vscode/dot-config/Code/languagepacks.json
 vscode/dot-config/Code/machineid
+nvim/dot-config/nvim/lazy-lock.json
+nvim/dot-config/nvim/lazyvim.json
