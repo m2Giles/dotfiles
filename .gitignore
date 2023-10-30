@@ -16,12 +16,13 @@ vscode/dot-config/Code/User/History
 vscode/dot-config/Code/User/globalStorage/ms-vscode-remote.remote-containers/imageConfigs
 vscode/dot-config/Code/User/globalStorage/ms-vscode-remote.remote-containers/cli-bin
 vscode/dot-config/Code/User/globalStorage/ms-vscode-remote.remote-containers/nameConfigs
+vscode/dot-config/Code/User/globalStorage/ms-vscode-remote.remote.remote-ssh
 vscode/dot-config/Code/User/globalStorage/vscodevim.vim
 vscode/dot-config/Code/User/globalStorage/state.vscdb
 vscode/dot-config/Code/User/globalStorage/state.vscdb.backup
 vscode/dot-config/Code/User/globalStorage/storage.json
 vscode/dot-config/Code/User/workspaceStorage
-vscode/dot-config/Code/User/settings.json
+vscode/dot-config/Code/User/sync
 vscode/dot-config/Code/WebStorage
 vscode/dot-config/Code/databases
 vscode/dot-config/Code/logs

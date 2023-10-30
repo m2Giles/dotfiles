@@ -1,4 +1,10 @@
 {
     "dev.containers.dockerPath": "podman",
-    "editor.fontFamily": "'CaskaydiaCove Nerd Font' , 'Droid Sans Mono', 'monospace', monospace",
+    "editor.fontFamily": "'CaskaydiaCove Nerd Font','Droid Sans Mono', 'monospace', monospace",
+    "editor.fontLigatures": true,
+    "editor.minimap.enabled": false,
+    "terminal.integrated.enableImages": true,
+    "files.autoSave": "afterDelay",
+    "dotfiles.repository": "https://github.com/m2Giles/dotfiles",
+    "dotfiles.targetPath": "~/.dotfiles",
 }
