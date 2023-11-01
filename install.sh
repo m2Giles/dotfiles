@@ -12,17 +12,15 @@ elif [ -f ~/.bash_profile ]; then
     echo "Backed up .bash_profile"
 fi
 
-if [ command -v stow]; then
+if [ $(command -v stow) ]; then
     stow --restow 
 else
-    ln -s bash/dot-bashrc $HOME/.bashrc
-    ln -s bash/dot-profile $HOME/.bash_profile
-    ln -s bash/dot-bashrc.d $HOME/.bashrc.d
-    ln -s emacs/dot-emacs.d $HOME/.emacs.d
-    ln -s shell/dot-inputrc $HOME/.inputrc
+    ln -s $HOME/.dotfiles/bash/dot-bashrc $HOME/.bashrc
+    ln -s $HOME/.dotfiles/bash/dot-profile $HOME/.bash_profile
+    ln -s $HOME/.dotfiles/bash/dot-bashrc.d $HOME/.bashrc.d
+    ln -s $HOME/.dotfiles/shell/dot-inputrc $HOME/.inputrc
     if [ ! -d "$HOME/.config" ]; then
         mkdir -p $HOME/.config
     fi
-    ln -s nvim/dot-config/nvim $HOME/.config/nvim
-    ln -s tmux/dot-config/tmux $HOME/.config/tmux
+    ln -s $HOME/.dotfiles/tmux/dot-config/tmux $HOME/.config/tmux
 fi

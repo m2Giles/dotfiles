@@ -1,1 +1,3 @@
-[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path bash)"
+if [[ "$TERM_PROGRAM" == "vscode" ]] && [[ -x /usr/bin/code ]]; then
+    . "$(code --locate-shell-integration-path bash)"
+fi

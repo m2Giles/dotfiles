@@ -138,6 +138,7 @@
   (m2/leader-keys
     "t" '(:ignore t :wk "Terminals")
     "t e" '(eshell-toggle :wk "Toggle Eshell")
+    "t v" '(vterm :wk "Create Vterm Terminal")
     "t t" '(eat :wk "Create Eat Terminal"))
   )
 
